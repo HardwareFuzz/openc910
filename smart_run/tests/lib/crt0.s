@@ -135,17 +135,28 @@ __exit:
   addi x1,x0,0x5a
   addi x2,x0,0x6b
   addi x3,x0,0x7c
-  sync
-  li   x3, 0x444333222
-  add x4,x0,x3
+  fence
+  lui  x5, 0x1fff
+  li   x6, 0x444333222
+  sd   x6, 0(x5)
+  fence
+1:
+  wfi
+  j 1b
 #
   .global __fail
 __fail:
   addi x10,x0,0x0
   addi x1,x0,0x2c
   addi x2,x0,0x3b
-  sync
-  li x3,0x2382348720
+  fence
+  lui  x5, 0x1fff
+  li   x6, 0x2382348720
+  sd   x6, 0(x5)
+  fence
+2:
+  wfi
+  j 2b
 
 .section .text
 __trap_handler:
@@ -227,5 +238,3 @@ __dummy:
   nop
   nop
   nop
-
-

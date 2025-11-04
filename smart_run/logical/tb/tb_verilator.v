@@ -136,6 +136,8 @@ module top(
   integer i;
   bit [31:0] mem_inst_temp [65536];
   bit [31:0] mem_data_temp [65536];
+  string inst_pat_path;
+  string data_pat_path;
   integer j;
   initial
   begin
@@ -161,9 +163,16 @@ module top(
       `RTL_MEM.ram15.mem[i][7:0] = 8'h0;
     end
   
+    inst_pat_path = "inst.pat";
+    data_pat_path = "data.pat";
+    void'($value$plusargs("INST=%s", inst_pat_path));
+    void'($value$plusargs("DATA=%s", data_pat_path));
+
     $display("\t********* Read program *********");
-    $readmemh("inst.pat", mem_inst_temp);
-    $readmemh("data.pat", mem_data_temp);
+    $display("\t********* Using inst file: %s *********", inst_pat_path);
+    $display("\t********* Using data file: %s *********", data_pat_path);
+    $readmemh(inst_pat_path, mem_inst_temp);
+    $readmemh(data_pat_path, mem_data_temp);
   
     $display("\t********* Load program to memory *********");
     i=0;

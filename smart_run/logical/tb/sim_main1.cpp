@@ -7,6 +7,15 @@
 
 // For std::unique_ptr
 #include <memory>
+#include <cstdlib>
+#include <filesystem>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
+#include <unistd.h>
 
 // Include common routines
 #include <verilated.h>
@@ -17,6 +26,58 @@
 // Legacy function required only so linking works on Cygwin and MSVC++
 double sc_time_stamp() { return 0; }
 
+namespace {
+
+namespace fs = std::filesystem;
+
+std::string getEnvVar(const char* name) {
+    const char* value = std::getenv(name);
+    return value ? std::string(value) : std::string();
+}
+
+std::string quote(const fs::path& path) {
+    std::ostringstream oss;
+    oss << "\"" << path.string() << "\"";
+    return oss.str();
+}
+
+bool runCommand(const std::string& cmd) {
+    int ret = std::system(cmd.c_str());
+    if (ret != 0) {
+        std::cerr << "[sim_main1] Command failed (" << ret << "): " << cmd << std::endl;
+        return false;
+    }
+    return true;
+}
+
+struct TempDir {
+    fs::path path;
+    bool keep{false};
+    ~TempDir() {
+        if (!keep && !path.empty()) {
+            std::error_code ec;
+            fs::remove_all(path, ec);
+            if (ec) {
+                std::cerr << "[sim_main1] Warning: failed to remove temp dir " << path << ": " << ec.message() << std::endl;
+            }
+        }
+    }
+};
+
+fs::path makeTempDir(const std::string& prefix) {
+    fs::path tmpl = fs::temp_directory_path() / (prefix + "XXXXXX");
+    std::string tmplStr = tmpl.string();
+    std::vector<char> buffer(tmplStr.begin(), tmplStr.end());
+    buffer.push_back('\0');
+    char* dirName = mkdtemp(buffer.data());
+    if (!dirName) {
+        throw std::runtime_error("[sim_main1] Failed to create temporary directory");
+    }
+    return fs::path(dirName);
+}
+
+}  // namespace
+
 int main(int argc, char** argv, char** env) {
     // This is a more complicated example, please also see the simpler examples/make_hello_c.
 
@@ -25,6 +86,99 @@ int main(int argc, char** argv, char** env) {
 
     // Create logs/ directory in case we have traces to put under it
     Verilated::mkdir("logs");
+
+    std::vector<std::string> forwardedArgs;
+    forwardedArgs.reserve(argc + 4);
+    forwardedArgs.emplace_back(argv[0]);
+
+    std::string elfPath;
+    bool keepTemp = getEnvVar("KEEP_C910_TEMP") == "1";
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg(argv[i]);
+        if (arg == "--elf" && (i + 1) < argc) {
+            elfPath = argv[++i];
+        } else if (arg.rfind("--elf=", 0) == 0) {
+            elfPath = arg.substr(6);
+        } else if (arg == "--keep-temp") {
+            keepTemp = true;
+        } else {
+            forwardedArgs.emplace_back(std::move(arg));
+        }
+    }
+
+    TempDir tempDir;
+    tempDir.keep = keepTemp;
+
+    if (!elfPath.empty()) {
+        try {
+            tempDir.path = makeTempDir("c910_");
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << std::endl;
+            return 1;
+        }
+
+        fs::path elf = fs::absolute(elfPath);
+        fs::path instHex = tempDir.path / "inst.hex";
+        fs::path dataHex = tempDir.path / "data.hex";
+        fs::path fileHex = tempDir.path / "case.hex";
+        fs::path instPat = tempDir.path / "inst.pat";
+        fs::path dataPat = tempDir.path / "data.pat";
+
+        std::string toolExt = getEnvVar("TOOL_EXTENSION");
+        fs::path objcopyPath = toolExt.empty()
+                                   ? fs::path("riscv64-unknown-elf-objcopy")
+                                   : fs::path(toolExt) / "riscv64-unknown-elf-objcopy";
+
+        std::string srec2vmemPath = getEnvVar("SREC2VMEM");
+        if (srec2vmemPath.empty()) {
+            std::cerr << "[sim_main1] Environment variable SREC2VMEM is not set. "
+                      << "Please export it to the Srec2vmem executable path.\n";
+            return 1;
+        }
+
+        std::ostringstream cmd;
+        cmd << quote(objcopyPath) << " -O srec " << quote(elf) << " " << quote(instHex)
+            << " -j .text* -j .rodata* -j .eh_frame*";
+        if (!runCommand(cmd.str())) {
+            return 1;
+        }
+        cmd.str("");
+        cmd.clear();
+        cmd << quote(objcopyPath) << " -O srec " << quote(elf) << " " << quote(dataHex)
+            << " -j .data* -j .bss -j .COMMON";
+        if (!runCommand(cmd.str())) {
+            return 1;
+        }
+        cmd.str("");
+        cmd.clear();
+        cmd << quote(objcopyPath) << " -O srec " << quote(elf) << " " << quote(fileHex);
+        if (!runCommand(cmd.str())) {
+            return 1;
+        }
+
+        cmd.str("");
+        cmd.clear();
+        cmd << quote(fs::path(srec2vmemPath)) << " " << quote(instHex) << " " << quote(instPat);
+        if (!runCommand(cmd.str())) {
+            return 1;
+        }
+        cmd.str("");
+        cmd.clear();
+        cmd << quote(fs::path(srec2vmemPath)) << " " << quote(dataHex) << " " << quote(dataPat);
+        if (!runCommand(cmd.str())) {
+            return 1;
+        }
+
+        forwardedArgs.emplace_back("+INST=" + instPat.string());
+        forwardedArgs.emplace_back("+DATA=" + dataPat.string());
+    }
+
+    std::vector<char*> forwardedArgv;
+    forwardedArgv.reserve(forwardedArgs.size());
+    for (auto& arg : forwardedArgs) {
+        forwardedArgv.push_back(arg.data());
+    }
 
     // Construct a VerilatedContext to hold simulation time, etc.
     // Multiple modules (made later below with Vtop) may share the same
@@ -48,7 +202,7 @@ int main(int argc, char** argv, char** env) {
 
     // Pass arguments so Verilated code can see them, e.g. $value$plusargs
     // This needs to be called before you create any model
-    contextp->commandArgs(argc, argv);
+    contextp->commandArgs(static_cast<int>(forwardedArgv.size()), forwardedArgv.data());
 
     // Construct the Verilated model, from Vtop.h generated from Verilating "top.v".
     // Using unique_ptr is similar to "Vtop* top = new Vtop" then deleting at end.

@@ -1,0 +1,11 @@
+# Build artifacts
+*.o
+*.elf
+*.hex
+*.pat
+*.obj
+
+# Temporary conversion outputs
+inst.pat
+data.pat
+case.pat

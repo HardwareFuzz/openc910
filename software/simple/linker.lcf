@@ -1,0 +1,27 @@
+MEMORY
+{
+  RAM (rwx) : ORIGIN = 0x00000000, LENGTH = 0x00040000
+}
+
+ENTRY(__start)
+
+_stack_top = ORIGIN(RAM) + LENGTH(RAM);
+
+SECTIONS
+{
+  .text : {
+    *(.text*)
+    *(.rodata*)
+  } > RAM
+
+  .data : {
+    *(.data*)
+    *(.sdata*)
+  } > RAM
+
+  .bss : {
+    *(.bss*)
+    *(.sbss*)
+    *(COMMON)
+  } > RAM
+}
