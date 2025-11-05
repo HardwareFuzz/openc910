@@ -1,0 +1,105 @@
+
+/home/canxin/openc910/software/complex_amo/complex_amo.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000000000 <__start>:
+   0:	4281                	li	t0,0
+   2:	00449337          	lui	t1,0x449
+   6:	8cd3031b          	addiw	t1,t1,-1843 # 4488cd <__bss_end+0x408875>
+   a:	033a                	slli	t1,t1,0xe
+   c:	45530313          	addi	t1,t1,1109
+  10:	0332                	slli	t1,t1,0xc
+  12:	66730313          	addi	t1,t1,1639
+  16:	0332                	slli	t1,t1,0xc
+  18:	78830313          	addi	t1,t1,1928
+  1c:	4395                	li	t2,5
+  1e:	00730e33          	add	t3,t1,t2
+  22:	00040297          	auipc	t0,0x40
+  26:	fde28293          	addi	t0,t0,-34 # 40000 <buf0>
+  2a:	0062b023          	sd	t1,0(t0)
+  2e:	00040297          	auipc	t0,0x40
+  32:	fd228293          	addi	t0,t0,-46 # 40000 <buf0>
+  36:	547d                	li	s0,-1
+  38:	4495                	li	s1,5
+  3a:	00092937          	lui	s2,0x92
+  3e:	a2b9091b          	addiw	s2,s2,-1493 # 91a2b <__bss_end+0x519d3>
+  42:	0932                	slli	s2,s2,0xc
+  44:	3c590913          	addi	s2,s2,965
+  48:	0936                	slli	s2,s2,0xd
+  4a:	abd90913          	addi	s2,s2,-1347
+  4e:	0932                	slli	s2,s2,0xc
+  50:	def90913          	addi	s2,s2,-529
+  54:	00ff09b7          	lui	s3,0xff0
+  58:	0ff9899b          	addiw	s3,s3,255 # ff00ff <__bss_end+0xfb00a7>
+  5c:	09c2                	slli	s3,s3,0x10
+  5e:	0ff98993          	addi	s3,s3,255
+  62:	09c2                	slli	s3,s3,0x10
+  64:	0ff98993          	addi	s3,s3,255
+  68:	fd600a13          	li	s4,-42
+  6c:	fff00a9b          	addiw	s5,zero,-1
+  70:	1afe                	slli	s5,s5,0x3f
+  72:	1afd                	addi	s5,s5,-1
+  74:	4b41                	li	s6,16
+  76:	5bc1                	li	s7,-16
+  78:	4c45                	li	s8,17
+  7a:	0111acb7          	lui	s9,0x111a
+  7e:	a23c8c9b          	addiw	s9,s9,-1501 # 1119a23 <__bss_end+0x10d99cb>
+  82:	0cb2                	slli	s9,s9,0xc
+  84:	ab3c8c93          	addi	s9,s9,-1357
+  88:	0cb6                	slli	s9,s9,0xd
+  8a:	779c8c93          	addi	s9,s9,1913
+  8e:	0cb2                	slli	s9,s9,0xc
+  90:	899c8c93          	addi	s9,s9,-1895
+  94:	ffdebd37          	lui	s10,0xffdeb
+  98:	dbfd0d1b          	addiw	s10,s10,-577 # ffffffffffdeadbf <__bss_end+0xffffffffffdaad67>
+  9c:	0d3a                	slli	s10,s10,0xe
+  9e:	bf3d0d13          	addi	s10,s10,-1037
+  a2:	0d32                	slli	s10,s10,0xc
+  a4:	bfbd0d13          	addi	s10,s10,-1029
+  a8:	0d3a                	slli	s10,s10,0xe
+  aa:	0d05                	addi	s10,s10,1
+  ac:	0092b52f          	amoadd.d	a0,s1,(t0)
+  b0:	00828313          	addi	t1,t0,8
+  b4:	613335af          	amoand.d	a1,s3,(t1)
+  b8:	01028313          	addi	t1,t0,16
+  bc:	4123362f          	amoor.d	a2,s2,(t1)
+  c0:	01828313          	addi	t1,t0,24
+  c4:	213336af          	amoxor.d	a3,s3,(t1)
+  c8:	02028313          	addi	t1,t0,32
+  cc:	8143372f          	amomin.d	a4,s4,(t1)
+  d0:	02828313          	addi	t1,t0,40
+  d4:	a15337af          	amomax.d	a5,s5,(t1)
+  d8:	03028313          	addi	t1,t0,48
+  dc:	c163382f          	amominu.d	a6,s6,(t1)
+  e0:	03828313          	addi	t1,t0,56
+  e4:	e17338af          	amomaxu.d	a7,s7,(t1)
+  e8:	04028313          	addi	t1,t0,64
+  ec:	0183272f          	amoadd.w	a4,s8,(t1)
+  f0:	04828313          	addi	t1,t0,72
+  f4:	098327af          	amoswap.w	a5,s8,(t1)
+  f8:	05028313          	addi	t1,t0,80
+  fc:	09a3382f          	amoswap.d	a6,s10,(t1)
+ 100:	0492bc23          	sd	s1,88(t0)
+ 104:	20000eb7          	lui	t4,0x20000
+ 108:	3ec1                	addiw	t4,t4,-16 # 1ffffff0 <__bss_end+0x1ffbff98>
+ 10a:	04f00f13          	li	t5,79
+ 10e:	01eea023          	sw	t5,0(t4)
+ 112:	20000eb7          	lui	t4,0x20000
+ 116:	3ec1                	addiw	t4,t4,-16 # 1ffffff0 <__bss_end+0x1ffbff98>
+ 118:	04b00f13          	li	t5,75
+ 11c:	01eea023          	sw	t5,0(t4)
+ 120:	20000eb7          	lui	t4,0x20000
+ 124:	3ec1                	addiw	t4,t4,-16 # 1ffffff0 <__bss_end+0x1ffbff98>
+ 126:	4f29                	li	t5,10
+ 128:	01eea023          	sw	t5,0(t4)
+ 12c:	0330000f          	fence	rw,rw
+ 130:	00444337          	lui	t1,0x444
+ 134:	3333031b          	addiw	t1,t1,819 # 444333 <__bss_end+0x4042db>
+ 138:	0332                	slli	t1,t1,0xc
+ 13a:	22230313          	addi	t1,t1,546
+ 13e:	01fff2b7          	lui	t0,0x1fff
+ 142:	0062b023          	sd	t1,0(t0) # 1fff000 <__bss_end+0x1fbefa8>
+ 146:	10500073          	wfi
+ 14a:	bff5                	j	146 <__start+0x146>

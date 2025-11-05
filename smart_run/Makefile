@@ -106,7 +106,8 @@ else
         else
             ifeq ($(SIM), verilator)
               SIMULATOR_OPT := -Os -x-assign 0 -Wno-fatal --threads ${THREADS}
-              SIMULATOR_DEF := -cc --exe --top-module top 
+              # Default enable retire logger
+              SIMULATOR_DEF := -cc --exe --top-module top -DC910_LOGGER
               SIMULATOR_LOG := 
             else
             endif
@@ -274,5 +275,4 @@ help:
 	@echo "    make buildVerilator             			: run build executable file with Verilator;
 	@echo "    make runVerilator	           			: run simulation file with Verilator;
 	
-
 
