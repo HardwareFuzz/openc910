@@ -2402,6 +2402,12 @@ end
 //  or inst is vfpu
 //2.inst is not split
 //3.inst is not intmask
+`ifdef DISABLE_ALL_FUSION
+assign ctrl_ir_inst0_fold = 1'b0;
+assign ctrl_ir_inst1_fold = 1'b0;
+assign ctrl_ir_inst2_fold = 1'b0;
+assign ctrl_ir_inst3_fold = 1'b0;
+`else
 assign ctrl_ir_inst0_fold =
             (ctrl_ir_inst0_aiq01 || ctrl_ir_inst0_aiq0 || ctrl_ir_inst0_aiq1)
             && !ctrl_ir_inst0_special
@@ -2418,6 +2424,7 @@ assign ctrl_ir_inst3_fold =
             (ctrl_ir_inst3_aiq01 || ctrl_ir_inst3_aiq0 || ctrl_ir_inst3_aiq1)
             && !ctrl_ir_inst3_special
          || (ctrl_ir_inst3_viq0 || ctrl_ir_inst3_viq1 || ctrl_ir_inst3_viq01);
+`endif
 
 assign ctrl_ir_pre_dis_inst0_fold  = ctrl_ir_pre_dis_inst0_vld
                                      && ctrl_ir_inst0_fold

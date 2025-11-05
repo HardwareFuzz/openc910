@@ -2195,6 +2195,43 @@ assign retire_rob_ctc_flush_req = retire_ctc_flush_req;
 //==========================================================
 assign retire_rob_retire_empty = lsu_rtu_all_commit_data_vld;
 
+//==========================================================
+//                PC Print for Committed Instructions
+//==========================================================
+always @(posedge forever_cpuclk)
+begin
+`ifdef DEBUG_PC_TRACE
+  // Debug: detailed retire signals
+  if(rob_retire_inst0_vld) begin
+    $display("[DEBUG][RETIRE] inst0: vld=1, commit=%b, expt=%b, PC=0x%h", 
+             rob_retire_commit0, rob_retire_inst0_expt_vld, {rob_retire_inst0_cur_pc[38:0], 1'b0});
+  end
+  if(rob_retire_inst1_vld) begin
+    $display("[DEBUG][RETIRE] inst1: vld=1, commit=%b, PC=0x%h", 
+             rob_retire_commit1, {rob_retire_inst1_cur_pc[38:0], 1'b0});
+  end
+  if(rob_retire_inst2_vld) begin
+    $display("[DEBUG][RETIRE] inst2: vld=1, commit=%b, PC=0x%h", 
+             rob_retire_commit2, {rob_retire_inst2_cur_pc[38:0], 1'b0});
+  end
+`endif
+  
+  // Final committed instructions (always enabled)
+  // Note: This includes both normal commits and exception commits
+  if(rob_retire_commit0 && rob_retire_inst0_vld) begin
+    if(rob_retire_inst0_expt_vld)
+      $display("[COMMIT] PC: 0x%h (EXCEPTION)", {rob_retire_inst0_cur_pc[38:0], 1'b0});
+    else
+      $display("[COMMIT] PC: 0x%h", {rob_retire_inst0_cur_pc[38:0], 1'b0});
+  end
+  if(rob_retire_commit1 && rob_retire_inst1_vld) begin
+    $display("[COMMIT] PC: 0x%h", {rob_retire_inst1_cur_pc[38:0], 1'b0});
+  end
+  if(rob_retire_commit2 && rob_retire_inst2_vld) begin
+    $display("[COMMIT] PC: 0x%h", {rob_retire_inst2_cur_pc[38:0], 1'b0});
+  end
+end
+
 // &ModuleEnd; @1111
 endmodule
 

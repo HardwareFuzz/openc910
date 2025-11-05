@@ -18,6 +18,12 @@ buf:
 .equ SIM_PASS_VALUE, 0x0000000444333222
 
 __start:
+    /* Disable ALL optimizations in MHINT2 */
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+    or      t0, t0, t1
+    csrw    0x7C2, t0               /* Write back */
+
     /* Install trap handler */
     la      t0, trap_handler
     csrw    mtvec, t0
@@ -32,6 +38,16 @@ __start:
     j       user_code
 
 user_code:
+    /* ---------------- Simple GPR write tests (for PC/value check) ------- */
+regw_test:
+    /* Load a few distinctive constants; each should emit a GPR write */
+    li      a5, 0x00000000000000a5     /* x15 <- 0xA5 */
+    li      a6, 0x1122334455667788     /* x16 <- 0x1122334455667788 */
+    li      a7, 0xfedcba9876543210     /* x17 <- 0xFEDCBA9876543210 */
+    add     s0, a5, a5                 /* x8  <- 0x14A (0xA5 * 2) */
+    mv      s1, a6                     /* x9  <- 0x1122334455667788 */
+    addi    s2, a7, 1                  /* x18 <- 0xFEDCBA9876543211 */
+
     /* ------------ Integer GPR writes + memory stores ------------- */
     li      s1, 0x1111111111111111
     li      s2, 0x2222222222222222

@@ -5814,6 +5814,48 @@ assign read_entry1_pop_en = 1'b0;
 assign read_entry2_pop_en = 1'b0;
 
 //==========================================================
+//                  DEBUG: ROB Entry Read
+//==========================================================
+`ifdef DEBUG_PC_TRACE
+always @(posedge forever_cpuclk)
+begin
+  if(rob_read0_data[ROB_VLD]) begin
+    $display("[DEBUG][ROB_ENTRY] read0: iid=%0d, cmplt=%b", 
+             rob_read0_iid[6:0], rob_read0_data[ROB_CMPLT]);
+  end
+  if(rob_read1_data[ROB_VLD]) begin
+    $display("[DEBUG][ROB_ENTRY] read1: iid=%0d, cmplt=%b", 
+             rob_read1_iid[6:0], rob_read1_data[ROB_CMPLT]);
+  end
+  if(rob_read2_data[ROB_VLD]) begin
+    $display("[DEBUG][ROB_ENTRY] read2: iid=%0d, cmplt=%b", 
+             rob_read2_iid[6:0], rob_read2_data[ROB_CMPLT]);
+  end
+end
+`endif
+
+//==========================================================
+//                  DEBUG: ROB Create (from IDU)
+//==========================================================
+`ifdef DEBUG_PC_TRACE
+always @(posedge forever_cpuclk)
+begin
+  if(idu_rtu_rob_create0_en) begin
+    $display("[DEBUG][ROB_CREATE] create0_en=1");
+  end
+  if(idu_rtu_rob_create1_en) begin
+    $display("[DEBUG][ROB_CREATE] create1_en=1");
+  end
+  if(idu_rtu_rob_create2_en) begin
+    $display("[DEBUG][ROB_CREATE] create2_en=1");
+  end
+  if(idu_rtu_rob_create3_en) begin
+    $display("[DEBUG][ROB_CREATE] create3_en=1");
+  end
+end
+`endif
+
+//==========================================================
 //                  Pop for Retire Entry
 //==========================================================
 //----------------------------------------------------------

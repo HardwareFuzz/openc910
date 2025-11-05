@@ -1,0 +1,806 @@
+
+skiptrap.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000000000 <__start>:
+.equ SIM_CTRL_ADDR, 0x01fff000
+.equ SIM_PASS_VALUE, 0x0000000444333222
+
+__start:
+    /* Disable ALL optimizations in MHINT2 */
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	7c2022f3          	csrr	t0,0x7c2
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	6311                	lui	t1,0x4
+   6:	337d                	addiw	t1,t1,-1 # 3fff <buf+0x3e2f>
+    or      t0, t0, t1
+   8:	0062e2b3          	or	t0,t0,t1
+    csrw    0x7C2, t0               /* Write back */
+   c:	7c229073          	csrw	0x7c2,t0
+
+    /* Install trap handler */
+    la      t0, trap_handler
+  10:	00000297          	auipc	t0,0x0
+  14:	17028293          	addi	t0,t0,368 # 180 <trap_handler>
+    csrw    mtvec, t0
+  18:	30529073          	csrw	mtvec,t0
+
+    /* Enable floating-point (set FS=Dirty) and clear FCSR */
+    csrr    t0, mstatus
+  1c:	300022f3          	csrr	t0,mstatus
+    li      t1, 0x00003000          /* FS field -> Dirty */
+  20:	630d                	lui	t1,0x3
+    or      t0, t0, t1
+  22:	0062e2b3          	or	t0,t0,t1
+    csrw    mstatus, t0
+  26:	30029073          	csrw	mstatus,t0
+    csrw    fcsr, x0
+  2a:	00301073          	fscsr	zero
+
+    j       user_code
+  2e:	a009                	j	30 <regw_test>
+
+0000000000000030 <regw_test>:
+
+user_code:
+    /* ---------------- Simple GPR write tests (for PC/value check) ------- */
+regw_test:
+    /* Load a few distinctive constants; each should emit a GPR write */
+    li      a5, 0x00000000000000a5     /* x15 <- 0xA5 */
+  30:	0a500793          	li	a5,165
+    li      a6, 0x1122334455667788     /* x16 <- 0x1122334455667788 */
+  34:	00449837          	lui	a6,0x449
+  38:	8cd8081b          	addiw	a6,a6,-1843 # 4488cd <_stack_top+0x4088cd>
+  3c:	083a                	slli	a6,a6,0xe
+  3e:	45580813          	addi	a6,a6,1109
+  42:	0832                	slli	a6,a6,0xc
+  44:	66780813          	addi	a6,a6,1639
+  48:	0832                	slli	a6,a6,0xc
+  4a:	78880813          	addi	a6,a6,1928
+    li      a7, 0xfedcba9876543210     /* x17 <- 0xFEDCBA9876543210 */
+  4e:	fff6e8b7          	lui	a7,0xfff6e
+  52:	5d58889b          	addiw	a7,a7,1493 # fffffffffff6e5d5 <SIM_PASS_VALUE+0xfffffffbbbc3b3b3>
+  56:	08b2                	slli	a7,a7,0xc
+  58:	c3b88893          	addi	a7,a7,-965
+  5c:	08b6                	slli	a7,a7,0xd
+  5e:	54388893          	addi	a7,a7,1347
+  62:	08b2                	slli	a7,a7,0xc
+  64:	21088893          	addi	a7,a7,528
+    add     s0, a5, a5                 /* x8  <- 0x14A (0xA5 * 2) */
+  68:	00f78433          	add	s0,a5,a5
+    mv      s1, a6                     /* x9  <- 0x1122334455667788 */
+  6c:	84c2                	mv	s1,a6
+    addi    s2, a7, 1                  /* x18 <- 0xFEDCBA9876543211 */
+  6e:	00188913          	addi	s2,a7,1
+
+    /* ------------ Integer GPR writes + memory stores ------------- */
+    li      s1, 0x1111111111111111
+  72:	011114b7          	lui	s1,0x1111
+  76:	1114849b          	addiw	s1,s1,273 # 1111111 <_stack_top+0x10d1111>
+  7a:	04b2                	slli	s1,s1,0xc
+  7c:	11148493          	addi	s1,s1,273
+  80:	04b2                	slli	s1,s1,0xc
+  82:	11148493          	addi	s1,s1,273
+  86:	04b2                	slli	s1,s1,0xc
+  88:	11148493          	addi	s1,s1,273
+    li      s2, 0x2222222222222222
+  8c:	01111937          	lui	s2,0x1111
+  90:	1119091b          	addiw	s2,s2,273 # 1111111 <_stack_top+0x10d1111>
+  94:	0932                	slli	s2,s2,0xc
+  96:	11190913          	addi	s2,s2,273
+  9a:	0932                	slli	s2,s2,0xc
+  9c:	11190913          	addi	s2,s2,273
+  a0:	0936                	slli	s2,s2,0xd
+  a2:	22290913          	addi	s2,s2,546
+    add     s3, s1, s2             /* = 0x3333... */
+  a6:	012489b3          	add	s3,s1,s2
+    la      t0, buf
+  aa:	1d000293          	li	t0,464
+    sd      s3, 0(t0)              /* store 8B */
+  ae:	0132b023          	sd	s3,0(t0)
+    sh      s2, 8(t0)              /* store 2B */
+  b2:	01229423          	sh	s2,8(t0)
+    sb      s1, 10(t0)             /* store 1B */
+  b6:	00928523          	sb	s1,10(t0)
+    sw      s3, 12(t0)             /* store 4B */
+  ba:	0132a623          	sw	s3,12(t0)
+
+    /* ---------------- Floating-point writes + stores -------------- */
+    /* f0 = 1.0, f1 = 2.0, f2 = 3.0, f3 = f1*f2 = 6.0 */
+    li      t3, 0x3ff0000000000000 /* +1.0 in IEEE754 double */
+  be:	3ff00e1b          	addiw	t3,zero,1023
+  c2:	1e52                	slli	t3,t3,0x34
+    fmv.d.x f0, t3
+  c4:	f20e0053          	fmv.d.x	ft0,t3
+    fadd.d  f1, f0, f0
+  c8:	020070d3          	fadd.d	ft1,ft0,ft0
+    li      t3, 0x4008000000000000 /* +3.0 */
+  cc:	6e05                	lui	t3,0x1
+  ce:	801e0e1b          	addiw	t3,t3,-2047 # 801 <buf+0x631>
+  d2:	1e4e                	slli	t3,t3,0x33
+    fmv.d.x f2, t3
+  d4:	f20e0153          	fmv.d.x	ft2,t3
+    fmul.d  f3, f1, f2
+  d8:	1220f1d3          	fmul.d	ft3,ft1,ft2
+    fsd     f1, 16(t0)
+  dc:	0012b827          	fsd	ft1,16(t0)
+    fsd     f3, 24(t0)
+  e0:	0032bc27          	fsd	ft3,24(t0)
+
+    /* ------------------------ Trap skipping ----------------------- */
+    li      s0, 0                  /* counter for skipped insns */
+  e4:	4401                	li	s0,0
+  e6:	0000                	unimp
+  e8:	0000                	unimp
+    .word   0x00000000             /* illegal 32b insn */
+    addi    s0, s0, 1
+  ea:	0405                	addi	s0,s0,1
+  ec:	0000                	unimp
+    .2byte  0x0000                 /* illegal 16b insn */
+    addi    s0, s0, 1
+  ee:	0405                	addi	s0,s0,1
+    li      t2, 2
+  f0:	4389                	li	t2,2
+    bne     s0, t2, fail
+  f2:	06741563          	bne	s0,t2,15c <fail>
+
+    /* More mixed stores after trap to enrich log */
+    li      a0, 0xdeadbeefcafef00d
+  f6:	fdeae537          	lui	a0,0xfdeae
+  fa:	bef5051b          	addiw	a0,a0,-1041 # fffffffffdeadbef <SIM_PASS_VALUE+0xfffffffbb9b7a9cd>
+  fe:	0532                	slli	a0,a0,0xc
+ 100:	fcb50513          	addi	a0,a0,-53
+ 104:	0532                	slli	a0,a0,0xc
+ 106:	153d                	addi	a0,a0,-17
+ 108:	0532                	slli	a0,a0,0xc
+ 10a:	0535                	addi	a0,a0,13
+    sd      a0, 32(t0)
+ 10c:	02a2b023          	sd	a0,32(t0)
+    li      a1, 0x7f
+ 110:	07f00593          	li	a1,127
+    sb      a1, 40(t0)
+ 114:	02b28423          	sb	a1,40(t0)
+
+    /* ---------------- AMO (simultaneous reg+mem) operations ---------------- */
+    /* Prepare targets */
+    la      t5, buf
+ 118:	1d000f13          	li	t5,464
+    addi    t5, t5, 48            /* 8B-aligned slot */
+ 11c:	030f0f13          	addi	t5,t5,48
+    li      t6, 0x10
+ 120:	4fc1                	li	t6,16
+    sd      t6, 0(t5)
+ 122:	01ff3023          	sd	t6,0(t5)
+    li      t2, 5
+ 126:	4395                	li	t2,5
+    /* t3 <- old [t5]; [t5] += 5 */
+    amoadd.d t3, t2, (t5)
+ 128:	007f3e2f          	amoadd.d	t3,t2,(t5)
+    /* Now swap in 0x1234...; t4 gets old (which was 0x15) */
+    li      t6, 0x123456789abcdef0
+ 12c:	00247fb7          	lui	t6,0x247
+ 130:	8adf8f9b          	addiw	t6,t6,-1875 # 2468ad <_stack_top+0x2068ad>
+ 134:	0fba                	slli	t6,t6,0xe
+ 136:	c4df8f93          	addi	t6,t6,-947
+ 13a:	0fb2                	slli	t6,t6,0xc
+ 13c:	5e7f8f93          	addi	t6,t6,1511
+ 140:	0fb6                	slli	t6,t6,0xd
+ 142:	ef0f8f93          	addi	t6,t6,-272
+    amoswap.d t4, t6, (t5)
+ 146:	09ff3eaf          	amoswap.d	t4,t6,(t5)
+    /* 32-bit AMO on 4B-aligned addr (t5+8) */
+    addi    a2, t5, 8
+ 14a:	008f0613          	addi	a2,t5,8
+    li      t1, 0x7
+ 14e:	431d                	li	t1,7
+    sw      t1, 0(a2)
+ 150:	00662023          	sw	t1,0(a2)
+    li      t1, 0x3
+ 154:	430d                	li	t1,3
+    amoadd.w s5, t1, (a2)
+ 156:	00662aaf          	amoadd.w	s5,t1,(a2)
+
+    j       exit
+ 15a:	a011                	j	15e <exit>
+
+000000000000015c <fail>:
+
+fail:
+    j       fail
+ 15c:	a001                	j	15c <fail>
+
+000000000000015e <exit>:
+
+exit:
+    /* Notify smart TB and park */
+    li      t0, SIM_CTRL_ADDR
+ 15e:	01fff2b7          	lui	t0,0x1fff
+    li      t1, SIM_PASS_VALUE
+ 162:	00444337          	lui	t1,0x444
+ 166:	3333031b          	addiw	t1,t1,819 # 444333 <_stack_top+0x404333>
+ 16a:	0332                	slli	t1,t1,0xc
+ 16c:	22230313          	addi	t1,t1,546
+    sd      t1, 0(t0)
+ 170:	0062b023          	sd	t1,0(t0) # 1fff000 <SIM_CTRL_ADDR>
+    fence
+ 174:	0ff0000f          	fence
+1:
+    wfi
+ 178:	10500073          	wfi
+    j       1b
+ 17c:	bff5                	j	178 <exit+0x1a>
+ 17e:	0001                	nop
+
+0000000000000180 <trap_handler>:
+
+.align 2
+trap_handler:
+    csrr    t0, mepc            /* faulting PC */
+ 180:	341022f3          	csrr	t0,mepc
+    csrr    t1, mcause
+ 184:	34202373          	csrr	t1,mcause
+    csrr    t4, mtval
+ 188:	34302ef3          	csrr	t4,mtval
+
+    slli    t5, t1, 1           /* clear interrupt bit */
+ 18c:	00131f13          	slli	t5,t1,0x1
+    srli    t1, t5, 1
+ 190:	001f5313          	srli	t1,t5,0x1
+
+    li      t2, 2               /* default len = 2 bytes */
+ 194:	4389                	li	t2,2
+
+    li      t3, 2               /* illegal instruction */
+ 196:	4e09                	li	t3,2
+    beq     t1, t3, decode_length
+ 198:	01c30a63          	beq	t1,t3,1ac <decode_length>
+    li      t3, 1               /* instruction access fault */
+ 19c:	4e05                	li	t3,1
+    beq     t1, t3, update_mepc
+ 19e:	01c30f63          	beq	t1,t3,1bc <update_mepc>
+    li      t3, 12              /* instruction page fault */
+ 1a2:	4e31                	li	t3,12
+    beq     t1, t3, update_mepc
+ 1a4:	01c30c63          	beq	t1,t3,1bc <update_mepc>
+
+    lhu     t4, 0(t0)           /* fetch encoding if mtval not useful */
+ 1a8:	0002de83          	lhu	t4,0(t0)
+
+00000000000001ac <decode_length>:
+
+decode_length:
+    andi    t4, t4, 3
+ 1ac:	003efe93          	andi	t4,t4,3
+    li      t3, 3
+ 1b0:	4e0d                	li	t3,3
+    bne     t4, t3, compressed_len
+ 1b2:	01ce9463          	bne	t4,t3,1ba <compressed_len>
+    li      t2, 4               /* standard 32-bit instruction */
+ 1b6:	4391                	li	t2,4
+    j       update_mepc
+ 1b8:	a011                	j	1bc <update_mepc>
+
+00000000000001ba <compressed_len>:
+
+compressed_len:
+    li      t2, 2               /* compressed instruction */
+ 1ba:	4389                	li	t2,2
+
+00000000000001bc <update_mepc>:
+
+update_mepc:
+    add     t0, t0, t2
+ 1bc:	929e                	add	t0,t0,t2
+    csrw    mepc, t0
+ 1be:	34129073          	csrw	mepc,t0
+    csrw    mcause, x0
+ 1c2:	34201073          	csrw	mcause,zero
+    csrw    mtval, x0
+ 1c6:	34301073          	csrw	mtval,zero
+    mret
+ 1ca:	30200073          	mret
+ 1ce:	0001                	nop
+
+Disassembly of section .data:
+
+00000000000001d0 <buf>:
+	...
+
+Disassembly of section .riscv.attributes:
+
+0000000000000000 <.riscv.attributes>:
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	7541                	lui	a0,0xffff0
+   2:	0000                	unimp
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	7200                	ld	s0,32(a2)
+   6:	7369                	lui	t1,0xffffa
+    or      t0, t0, t1
+   8:	01007663          	bgeu	zero,a6,14 <__start+0x14>
+    csrw    0x7C2, t0               /* Write back */
+   c:	0000006b          	.insn	4, 0x006b
+    la      t0, trap_handler
+  10:	7205                	lui	tp,0xfffe1
+  12:	3676                	fld	fa2,376(sp)
+  14:	6934                	ld	a3,80(a0)
+  16:	7032                	.insn	2, 0x7032
+    csrw    mtvec, t0
+  18:	5f31                	li	t5,-20
+  1a:	326d                	addiw	tp,tp,-5 # fffffffffffe0ffb <SIM_PASS_VALUE+0xfffffffbbbcaddd9>
+    csrr    t0, mstatus
+  1c:	3070                	fld	fa2,224(s0)
+  1e:	615f 7032 5f31      	.insn	6, 0x5f317032615f
+    or      t0, t0, t1
+  24:	3266                	fld	ft4,120(sp)
+    csrw    mstatus, t0
+  26:	3270                	fld	fa2,224(a2)
+  28:	645f 7032 5f32      	.insn	6, 0x5f327032645f
+    j       user_code
+  2e:	30703263          	.insn	4, 0x30703263
+    li      a5, 0x00000000000000a5     /* x15 <- 0xA5 */
+  32:	7a5f 6369 7273      	.insn	6, 0x727363697a5f
+    li      a6, 0x1122334455667788     /* x16 <- 0x1122334455667788 */
+  38:	7032                	.insn	2, 0x7032
+  3a:	5f30                	lw	a2,120(a4)
+  3c:	697a                	ld	s2,408(sp)
+  3e:	6566                	ld	a0,88(sp)
+  40:	636e                	ld	t1,216(sp)
+  42:	6965                	lui	s2,0x19
+  44:	7032                	.insn	2, 0x7032
+  46:	5f30                	lw	a2,120(a4)
+  48:	6d7a                	ld	s10,408(sp)
+  4a:	756d                	lui	a0,0xffffb
+  4c:	316c                	fld	fa1,224(a0)
+    li      a7, 0xfedcba9876543210     /* x17 <- 0xFEDCBA9876543210 */
+  4e:	3070                	fld	fa2,224(s0)
+  50:	7a5f 6161 6f6d      	.insn	6, 0x6f6d61617a5f
+  56:	7031                	c.lui	zero,0xfffec
+  58:	5f30                	lw	a2,120(a4)
+  5a:	617a                	ld	sp,408(sp)
+  5c:	726c                	ld	a1,224(a2)
+  5e:	70316373          	csrrsi	t1,0x703,2
+  62:	5f30                	lw	a2,120(a4)
+  64:	637a                	ld	t1,408(sp)
+  66:	3161                	addiw	sp,sp,-8
+    add     s0, a5, a5                 /* x8  <- 0x14A (0xA5 * 2) */
+  68:	3070                	fld	fa2,224(s0)
+  6a:	7a5f 6463 7031      	.insn	6, 0x703164637a5f
+    addi    s2, a7, 1                  /* x18 <- 0xFEDCBA9876543211 */
+  70:	0030                	addi	a2,sp,8
+    li      s1, 0x1111111111111111
+  72:	0108                	addi	a0,sp,128
+  74:	0b0a                	slli	s6,s6,0x2
+
+Disassembly of section .debug_line:
+
+0000000000000000 <.debug_line>:
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	0250                	addi	a2,sp,260
+   2:	0000                	unimp
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	0005                	c.nop	1
+   6:	0008                	.insn	2, 0x0008
+    or      t0, t0, t1
+   8:	002a                	c.slli	zero,0xa
+   a:	0000                	unimp
+    csrw    0x7C2, t0               /* Write back */
+   c:	0101                	addi	sp,sp,0
+   e:	fb01                	bnez	a4,ffffffffffffff1e <SIM_PASS_VALUE+0xfffffffbbbccccfc>
+    la      t0, trap_handler
+  10:	0d0e                	slli	s10,s10,0x3
+  12:	0100                	addi	s0,sp,128
+  14:	0101                	addi	sp,sp,0
+  16:	0001                	nop
+    csrw    mtvec, t0
+  18:	0000                	unimp
+  1a:	0001                	nop
+    csrr    t0, mstatus
+  1c:	0100                	addi	s0,sp,128
+  1e:	0101                	addi	sp,sp,0
+    li      t1, 0x00003000          /* FS field -> Dirty */
+  20:	011f 0000 0000      	.insn	6, 0x011f
+    csrw    mstatus, t0
+  26:	0102                	c.slli64	sp
+  28:	021f 020f 0028      	.insn	6, 0x0028020f021f
+    j       user_code
+  2e:	0000                	unimp
+    li      a5, 0x00000000000000a5     /* x15 <- 0xA5 */
+  30:	2800                	fld	fs0,16(s0)
+  32:	0000                	unimp
+    li      a6, 0x1122334455667788     /* x16 <- 0x1122334455667788 */
+  34:	0000                	unimp
+  36:	0900                	addi	s0,sp,144
+  38:	0002                	c.slli64	zero
+  3a:	0000                	unimp
+  3c:	0000                	unimp
+  3e:	0000                	unimp
+  40:	0300                	addi	s0,sp,384
+  42:	0115                	addi	sp,sp,5
+  44:	04090103          	lb	sp,64(s2) # 19040 <buf+0x18e70>
+  48:	0100                	addi	s0,sp,128
+  4a:	04090103          	lb	sp,64(s2)
+    li      a7, 0xfedcba9876543210     /* x17 <- 0xFEDCBA9876543210 */
+  4e:	0100                	addi	s0,sp,128
+  50:	04090103          	lb	sp,64(s2)
+  54:	0100                	addi	s0,sp,128
+  56:	04090303          	lb	t1,64(s2)
+  5a:	0100                	addi	s0,sp,128
+  5c:	08090103          	lb	sp,128(s2)
+  60:	0100                	addi	s0,sp,128
+  62:	04090303          	lb	t1,64(s2)
+  66:	0100                	addi	s0,sp,128
+    add     s0, a5, a5                 /* x8  <- 0x14A (0xA5 * 2) */
+  68:	04090103          	lb	sp,64(s2)
+    mv      s1, a6                     /* x9  <- 0x1122334455667788 */
+  6c:	0100                	addi	s0,sp,128
+    addi    s2, a7, 1                  /* x18 <- 0xFEDCBA9876543211 */
+  6e:	02090103          	lb	sp,32(s2)
+    li      s1, 0x1111111111111111
+  72:	0100                	addi	s0,sp,128
+  74:	04090103          	lb	sp,64(s2)
+  78:	0100                	addi	s0,sp,128
+  7a:	04090103          	lb	sp,64(s2)
+  7e:	0100                	addi	s0,sp,128
+  80:	04090203          	lb	tp,64(s2)
+  84:	0100                	addi	s0,sp,128
+  86:	02090603          	lb	a2,32(s2)
+  8a:	0100                	addi	s0,sp,128
+    li      s2, 0x2222222222222222
+  8c:	04090103          	lb	sp,64(s2)
+  90:	0100                	addi	s0,sp,128
+  92:	1a090103          	lb	sp,416(s2)
+  96:	0100                	addi	s0,sp,128
+  98:	1a090103          	lb	sp,416(s2)
+  9c:	0100                	addi	s0,sp,128
+  9e:	04090103          	lb	sp,64(s2)
+  a2:	0100                	addi	s0,sp,128
+  a4:	02090103          	lb	sp,32(s2)
+    add     s3, s1, s2             /* = 0x3333... */
+  a8:	0100                	addi	s0,sp,128
+    la      t0, buf
+  aa:	04090303          	lb	t1,64(s2)
+    sd      s3, 0(t0)              /* store 8B */
+  ae:	0100                	addi	s0,sp,128
+  b0:	1a090103          	lb	sp,416(s2)
+    sh      s2, 8(t0)              /* store 2B */
+  b4:	0100                	addi	s0,sp,128
+    sb      s1, 10(t0)             /* store 1B */
+  b6:	1a090103          	lb	sp,416(s2)
+    sw      s3, 12(t0)             /* store 4B */
+  ba:	0100                	addi	s0,sp,128
+  bc:	04090103          	lb	sp,64(s2)
+    li      t3, 0x3ff0000000000000 /* +1.0 in IEEE754 double */
+  c0:	0100                	addi	s0,sp,128
+  c2:	04090103          	lb	sp,64(s2)
+    fmv.d.x f0, t3
+  c6:	0100                	addi	s0,sp,128
+    fadd.d  f1, f0, f0
+  c8:	04090103          	lb	sp,64(s2)
+    li      t3, 0x4008000000000000 /* +3.0 */
+  cc:	0100                	addi	s0,sp,128
+  ce:	04090103          	lb	sp,64(s2)
+  d2:	0100                	addi	s0,sp,128
+    fmv.d.x f2, t3
+  d4:	04090103          	lb	sp,64(s2)
+    fmul.d  f3, f1, f2
+  d8:	0100                	addi	s0,sp,128
+  da:	04090403          	lb	s0,64(s2)
+    fsd     f1, 16(t0)
+  de:	0100                	addi	s0,sp,128
+    fsd     f3, 24(t0)
+  e0:	06090103          	lb	sp,96(s2)
+    li      s0, 0                  /* counter for skipped insns */
+  e4:	0100                	addi	s0,sp,128
+  e6:	04090103          	lb	sp,64(s2)
+    addi    s0, s0, 1
+  ea:	0100                	addi	s0,sp,128
+  ec:	04090103          	lb	sp,64(s2)
+    li      t2, 2
+  f0:	0100                	addi	s0,sp,128
+    bne     s0, t2, fail
+  f2:	08090103          	lb	sp,128(s2)
+    li      a0, 0xdeadbeefcafef00d
+  f6:	0100                	addi	s0,sp,128
+  f8:	04090103          	lb	sp,64(s2)
+  fc:	0100                	addi	s0,sp,128
+  fe:	04090103          	lb	sp,64(s2)
+ 102:	0100                	addi	s0,sp,128
+ 104:	04090103          	lb	sp,64(s2)
+ 108:	0100                	addi	s0,sp,128
+ 10a:	04090303          	lb	t1,64(s2)
+    sd      a0, 32(t0)
+ 10e:	0100                	addi	s0,sp,128
+    li      a1, 0x7f
+ 110:	06090203          	lb	tp,96(s2)
+    sb      a1, 40(t0)
+ 114:	0100                	addi	s0,sp,128
+ 116:	04090203          	lb	tp,64(s2)
+    la      t5, buf
+ 11a:	0100                	addi	s0,sp,128
+    addi    t5, t5, 48            /* 8B-aligned slot */
+ 11c:	02090103          	lb	sp,32(s2)
+    li      t6, 0x10
+ 120:	0100                	addi	s0,sp,128
+    sd      t6, 0(t5)
+ 122:	02090103          	lb	sp,32(s2)
+    li      t2, 5
+ 126:	0100                	addi	s0,sp,128
+    amoadd.d t3, t2, (t5)
+ 128:	04090303          	lb	t1,64(s2)
+    li      t6, 0x123456789abcdef0
+ 12c:	0100                	addi	s0,sp,128
+ 12e:	16090103          	lb	sp,352(s2)
+ 132:	0100                	addi	s0,sp,128
+ 134:	04090103          	lb	sp,64(s2)
+ 138:	0100                	addi	s0,sp,128
+ 13a:	04090103          	lb	sp,64(s2)
+ 13e:	0100                	addi	s0,sp,128
+ 140:	04090403          	lb	s0,64(s2)
+ 144:	0100                	addi	s0,sp,128
+    amoswap.d t4, t6, (t5)
+ 146:	04090103          	lb	sp,64(s2)
+    addi    a2, t5, 8
+ 14a:	0100                	addi	s0,sp,128
+ 14c:	04090103          	lb	sp,64(s2)
+    sw      t1, 0(a2)
+ 150:	0100                	addi	s0,sp,128
+ 152:	02090103          	lb	sp,32(s2)
+    amoadd.w s5, t1, (a2)
+ 156:	0100                	addi	s0,sp,128
+ 158:	04090103          	lb	sp,64(s2)
+    j       fail
+ 15c:	0100                	addi	s0,sp,128
+    li      t0, SIM_CTRL_ADDR
+ 15e:	02090203          	lb	tp,32(s2)
+    li      t1, SIM_PASS_VALUE
+ 162:	0100                	addi	s0,sp,128
+ 164:	04090203          	lb	tp,64(s2)
+ 168:	0100                	addi	s0,sp,128
+ 16a:	1a090103          	lb	sp,416(s2)
+ 16e:	0100                	addi	s0,sp,128
+    sd      t1, 0(t0)
+ 170:	04090203          	lb	tp,64(s2)
+    fence
+ 174:	0100                	addi	s0,sp,128
+ 176:	04090103          	lb	sp,64(s2)
+    wfi
+ 17a:	0100                	addi	s0,sp,128
+    j       1b
+ 17c:	02090103          	lb	sp,32(s2)
+    csrr    t0, mepc            /* faulting PC */
+ 180:	0100                	addi	s0,sp,128
+ 182:	04090103          	lb	sp,64(s2)
+    csrr    t1, mcause
+ 186:	0100                	addi	s0,sp,128
+    csrr    t4, mtval
+ 188:	02090103          	lb	sp,32(s2)
+    slli    t5, t1, 1           /* clear interrupt bit */
+ 18c:	0100                	addi	s0,sp,128
+ 18e:	04090203          	lb	tp,64(s2)
+    srli    t1, t5, 1
+ 192:	0100                	addi	s0,sp,128
+    li      t2, 2               /* default len = 2 bytes */
+ 194:	02090303          	lb	t1,32(s2)
+    beq     t1, t3, decode_length
+ 198:	0100                	addi	s0,sp,128
+ 19a:	02090403          	lb	s0,32(s2)
+    beq     t1, t3, update_mepc
+ 19e:	0100                	addi	s0,sp,128
+ 1a0:	04090103          	lb	sp,64(s2)
+    beq     t1, t3, update_mepc
+ 1a4:	0100                	addi	s0,sp,128
+ 1a6:	0e090103          	lb	sp,224(s2)
+    lhu     t4, 0(t0)           /* fetch encoding if mtval not useful */
+ 1aa:	0100                	addi	s0,sp,128
+    andi    t4, t4, 3
+ 1ac:	04090103          	lb	sp,64(s2)
+    li      t3, 3
+ 1b0:	0100                	addi	s0,sp,128
+    bne     t4, t3, compressed_len
+ 1b2:	04090203          	lb	tp,64(s2)
+    li      t2, 4               /* standard 32-bit instruction */
+ 1b6:	0100                	addi	s0,sp,128
+    j       update_mepc
+ 1b8:	04090103          	lb	sp,64(s2)
+    add     t0, t0, t2
+ 1bc:	0100                	addi	s0,sp,128
+    csrw    mepc, t0
+ 1be:	04090403          	lb	s0,64(s2)
+    csrw    mcause, x0
+ 1c2:	0100                	addi	s0,sp,128
+ 1c4:	04090103          	lb	sp,64(s2)
+    csrw    mtval, x0
+ 1c8:	0100                	addi	s0,sp,128
+    mret
+ 1ca:	04090103          	lb	sp,64(s2)
+ 1ce:	0100                	addi	s0,sp,128
+ 1d0:	04090203          	lb	tp,64(s2)
+ 1d4:	0100                	addi	s0,sp,128
+ 1d6:	04090103          	lb	sp,64(s2)
+ 1da:	0100                	addi	s0,sp,128
+ 1dc:	04090203          	lb	tp,64(s2)
+ 1e0:	0100                	addi	s0,sp,128
+ 1e2:	02090203          	lb	tp,32(s2)
+ 1e6:	0100                	addi	s0,sp,128
+ 1e8:	02090103          	lb	sp,32(s2)
+ 1ec:	0100                	addi	s0,sp,128
+ 1ee:	04090103          	lb	sp,64(s2)
+ 1f2:	0100                	addi	s0,sp,128
+ 1f4:	02090103          	lb	sp,32(s2)
+ 1f8:	0100                	addi	s0,sp,128
+ 1fa:	04090103          	lb	sp,64(s2)
+ 1fe:	0100                	addi	s0,sp,128
+ 200:	02090103          	lb	sp,32(s2)
+ 204:	0100                	addi	s0,sp,128
+ 206:	04090203          	lb	tp,64(s2)
+ 20a:	0100                	addi	s0,sp,128
+ 20c:	04090303          	lb	t1,64(s2)
+ 210:	0100                	addi	s0,sp,128
+ 212:	04090103          	lb	sp,64(s2)
+ 216:	0100                	addi	s0,sp,128
+ 218:	02090103          	lb	sp,32(s2)
+ 21c:	0100                	addi	s0,sp,128
+ 21e:	04090103          	lb	sp,64(s2)
+ 222:	0100                	addi	s0,sp,128
+ 224:	02090103          	lb	sp,32(s2)
+ 228:	0100                	addi	s0,sp,128
+ 22a:	02090303          	lb	t1,32(s2)
+ 22e:	0100                	addi	s0,sp,128
+ 230:	02090303          	lb	t1,32(s2)
+ 234:	0100                	addi	s0,sp,128
+ 236:	02090103          	lb	sp,32(s2)
+ 23a:	0100                	addi	s0,sp,128
+ 23c:	04090103          	lb	sp,64(s2)
+ 240:	0100                	addi	s0,sp,128
+ 242:	04090103          	lb	sp,64(s2)
+ 246:	0100                	addi	s0,sp,128
+ 248:	04090103          	lb	sp,64(s2)
+ 24c:	0100                	addi	s0,sp,128
+ 24e:	0409                	addi	s0,s0,2
+ 250:	0000                	unimp
+ 252:	0101                	addi	sp,sp,0
+
+Disassembly of section .debug_line_str:
+
+0000000000000000 <.debug_line_str>:
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	6d6f682f          	.insn	4, 0x6d6f682f
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	2f65                	addiw	t5,t5,25
+   6:	786e6163          	bltu	t3,t1,788 <buf+0x5b8>
+    or      t0, t0, t1
+   a:	6e69                	lui	t3,0x1a
+    csrw    0x7C2, t0               /* Write back */
+   c:	65706f2f          	.insn	4, 0x65706f2f
+    la      t0, trap_handler
+  10:	636e                	ld	t1,216(sp)
+  12:	3139                	addiw	sp,sp,-18
+  14:	2f30                	fld	fa2,88(a4)
+  16:	74666f73          	csrrsi	t5,0x746,12
+    csrw    mtvec, t0
+  1a:	65726177          	.insn	4, 0x65726177
+    csrr    t0, mstatus
+  1e:	696b732f          	.insn	4, 0x696b732f
+    or      t0, t0, t1
+  22:	7470                	ld	a2,232(s0)
+  24:	6172                	ld	sp,280(sp)
+    csrw    mstatus, t0
+  26:	0070                	addi	a2,sp,12
+  28:	70696b73          	csrrsi	s6,0x706,18
+    csrw    fcsr, x0
+  2c:	7274                	ld	a3,224(a2)
+    j       user_code
+  2e:	7061                	c.lui	zero,0xffff8
+    li      a5, 0x00000000000000a5     /* x15 <- 0xA5 */
+  30:	532e                	lw	t1,232(sp)
+	...
+
+Disassembly of section .debug_info:
+
+0000000000000000 <.debug_info>:
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	0025                	c.nop	9
+   2:	0000                	unimp
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	0005                	c.nop	1
+   6:	0801                	addi	a6,a6,0
+    or      t0, t0, t1
+   8:	0000                	unimp
+   a:	0000                	unimp
+    csrw    0x7C2, t0               /* Write back */
+   c:	0001                	nop
+	...
+    la      t0, trap_handler
+  16:	0000                	unimp
+    csrw    mtvec, t0
+  18:	d600                	sw	s0,40(a2)
+  1a:	00000003          	lb	zero,0(zero) # 0 <__start>
+    csrr    t0, mstatus
+  1e:	0b00                	addi	s0,sp,400
+    li      t1, 0x00003000          /* FS field -> Dirty */
+  20:	0000                	unimp
+    or      t0, t0, t1
+  22:	3300                	fld	fs0,32(a4)
+  24:	0000                	unimp
+    csrw    mstatus, t0
+  26:	0100                	addi	s0,sp,128
+  28:	80                	.byte	0x80
+
+Disassembly of section .debug_abbrev:
+
+0000000000000000 <.debug_abbrev>:
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	1101                	addi	sp,sp,-32
+   2:	1000                	addi	s0,sp,32
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	12011117          	auipc	sp,0x12011
+    or      t0, t0, t1
+   8:	1b0e030f          	.insn	4, 0x1b0e030f
+    csrw    0x7C2, t0               /* Write back */
+   c:	250e                	fld	fa0,192(sp)
+   e:	130e                	slli	t1,t1,0x23
+    la      t0, trap_handler
+  10:	0005                	c.nop	1
+	...
+
+Disassembly of section .debug_aranges:
+
+0000000000000000 <.debug_aranges>:
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	002c                	addi	a1,sp,8
+   2:	0000                	unimp
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	0002                	c.slli64	zero
+   6:	0000                	unimp
+    or      t0, t0, t1
+   8:	0000                	unimp
+   a:	0008                	.insn	2, 0x0008
+	...
+    csrw    mtvec, t0
+  18:	01ce                	slli	gp,gp,0x13
+	...
+
+Disassembly of section .debug_str:
+
+0000000000000000 <.debug_str>:
+    csrr    t0, 0x7C2               /* Read MHINT2 */
+   0:	70696b73          	csrrsi	s6,0x706,18
+    li      t1, 0x3FFF              /* Set bits[13:0] to disable all optimizations */
+   4:	7274                	ld	a3,224(a2)
+   6:	7061                	c.lui	zero,0xffff8
+    or      t0, t0, t1
+   8:	532e                	lw	t1,232(sp)
+   a:	2f00                	fld	fs0,24(a4)
+    csrw    0x7C2, t0               /* Write back */
+   c:	6f68                	ld	a0,216(a4)
+   e:	656d                	lui	a0,0x1b
+    la      t0, trap_handler
+  10:	6e61632f          	.insn	4, 0x6e61632f
+  14:	6978                	ld	a4,208(a0)
+  16:	2f6e                	fld	ft10,216(sp)
+    csrw    mtvec, t0
+  18:	6e65706f          	j	576fe <_stack_top+0x176fe>
+    csrr    t0, mstatus
+  1c:	30313963          	.insn	4, 0x30313963
+    li      t1, 0x00003000          /* FS field -> Dirty */
+  20:	666f732f          	.insn	4, 0x666f732f
+    or      t0, t0, t1
+  24:	7774                	ld	a3,232(a4)
+    csrw    mstatus, t0
+  26:	7261                	lui	tp,0xffff8
+  28:	2f65                	addiw	t5,t5,25
+    csrw    fcsr, x0
+  2a:	70696b73          	csrrsi	s6,0x706,18
+    j       user_code
+  2e:	7274                	ld	a3,224(a2)
+    li      a5, 0x00000000000000a5     /* x15 <- 0xA5 */
+  30:	7061                	c.lui	zero,0xffff8
+  32:	4700                	lw	s0,8(a4)
+    li      a6, 0x1122334455667788     /* x16 <- 0x1122334455667788 */
+  34:	554e                	lw	a0,240(sp)
+  36:	4120                	lw	s0,64(a0)
+  38:	2e322053          	.insn	4, 0x2e322053
+  3c:	3534                	fld	fa3,104(a0)
+	...

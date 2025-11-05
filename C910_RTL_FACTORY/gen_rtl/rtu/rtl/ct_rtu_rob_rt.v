@@ -2724,6 +2724,29 @@ assign rtu_yy_xx_commit0          = rob_commit0;
 assign rtu_yy_xx_commit1          = rob_commit1;
 assign rtu_yy_xx_commit2          = rob_commit2;
 
+//==========================================================
+//                  DEBUG: ROB RT Stage
+//==========================================================
+`ifdef DEBUG_PC_TRACE
+always @(posedge forever_cpuclk)
+begin
+  if(rob_read0_inst_vld) begin
+    $display("[DEBUG][ROB_RT] read0: PC=0x%h, cmplted=%b, commit=%b, commit_reg=%b", 
+             {rob_read0_cur_pc[38:0], 1'b0}, rob_read0_cmplted, rob_read0_commit, rob_commit0);
+  end
+  if(rob_read1_inst_vld) begin
+    $display("[DEBUG][ROB_RT] read1: PC=0x%h, cmplted=%b, commit=%b, commit_reg=%b", 
+             {rob_read1_cur_pc_addend0[38:0] + rob_read1_cur_pc_addend1[4:0], 1'b0}, 
+             rob_read1_cmplted, rob_read1_commit, rob_commit1);
+  end
+  if(rob_read2_inst_vld) begin
+    $display("[DEBUG][ROB_RT] read2: PC=0x%h, cmplted=%b, commit=%b, commit_reg=%b", 
+             {rob_read2_cur_pc_addend0[38:0] + rob_read2_cur_pc_addend1[4:0], 1'b0}, 
+             rob_read2_cmplted, rob_read2_commit, rob_commit2);
+  end
+end
+`endif
+
 assign rob_debug_commit0          = rob_commit0;
 
 assign rtu_yy_xx_commit0_iid[6:0] = rob_commit0_iid[6:0];
