@@ -56,6 +56,11 @@ module ct_rtu_pst_preg_entry(
   x_reset_mapped,
   x_retired_released_wb,
   x_wb_vld
+`ifdef C910_LOGGER
+  ,x_retire0_match_wb
+  ,x_retire1_match_wb
+  ,x_retire2_match_wb
+`endif
 );
 
 // &Ports; @28
@@ -180,6 +185,13 @@ wire    [4 :0]  x_reset_dst_reg;
 wire            x_reset_mapped;                     
 wire            x_retired_released_wb;              
 wire            x_wb_vld;                           
+
+`ifdef C910_LOGGER
+// Per-slot retire match (qualified by WB state) for debug wiring at top level
+output          x_retire0_match_wb;
+output          x_retire1_match_wb;
+output          x_retire2_match_wb;
+`endif
 
 
 parameter DEALLOC    = 5'b00001;
@@ -570,8 +582,19 @@ assign x_retired_released_wb = (lifecycle_cur_state_alloc
                                 || lifecycle_cur_state_release)
                                ? wb_cur_state_wb : 1'b1;
 
+`ifdef C910_LOGGER
+//----------------------------------------------------------
+//               Per-slot retire match (debug)
+//----------------------------------------------------------
+// Do not gate by wb_cur_state_wb to avoid missing valid retire writes
+assign x_retire0_match_wb = retire_pst_wb_retire_inst0_preg_vld
+                            && retire_inst0_iid_match;
+assign x_retire1_match_wb = retire_pst_wb_retire_inst1_preg_vld
+                            && retire_inst1_iid_match;
+assign x_retire2_match_wb = retire_pst_wb_retire_inst2_preg_vld
+                            && retire_inst2_iid_match;
+`endif
+
 
 // &ModuleEnd; @373
 endmodule
-
-
