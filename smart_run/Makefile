@@ -21,7 +21,8 @@ include ./setup/env_check.mk
 ################################################################################
 SIM = iverilog
 DUMP = off
-THREADS = 4
+# Auto-detect threads unless provided by caller
+THREADS ?= $(shell nproc --all 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
 
 # Generate C++ in executable form
 VERILATOR_FLAGS += -cc --exe
@@ -104,8 +105,8 @@ else
           SIMULATOR_DEF := -DIVERILOG_SIM
           SIMULATOR_LOG := 
         else
-            ifeq ($(SIM), verilator)
-              SIMULATOR_OPT := -Os -x-assign 0 -Wno-fatal --threads ${THREADS}
+									ifeq ($(SIM), verilator)
+										SIMULATOR_OPT := -Os -x-assign 0 -Wno-fatal --threads ${THREADS} --verilate-jobs ${THREADS} -j ${THREADS}
               # Default enable retire logger
               SIMULATOR_DEF := -cc --exe --top-module top -DC910_LOGGER
               SIMULATOR_LOG := 
@@ -139,7 +140,7 @@ else
 	  @cd ./work && iverilog $(TIMESCALE) $(SIMULATOR_OPT) $(SIMULATOR_DEF) $(SIM_FILELIST) $(SIM_DUMP) $(SIMULATOR_LOG)
         else
             ifeq ($(SIM), verilator)
-	      @cd ./work && verilator $(SIMULATOR_OPT) $(SIMULATOR_DEF) $(SIMULATOR_LOG) $(SIM_FILELIST) $(SIM_DUMP)
+		@cd ./work && verilator $(SIMULATOR_OPT) $(SIMULATOR_DEF) $(SIMULATOR_LOG) $(SIM_FILELIST) $(SIM_DUMP)
             else
 	      @echo "  [THead-smart] Please specify SIM = vcs to use VCS, or SIM = nc ,or SIM = verilator to use irun ..."
             endif
@@ -149,7 +150,7 @@ endif
 
 buildVerilator:
 	@cp ./logical/tb/Makefile_obj ./work/Makefile_obj
-	@cd ./work && make -j -C obj_dir -f ../Makefile_obj
+	@cd ./work && $(MAKE) -j ${THREADS} -C obj_dir -f ../Makefile_obj
 cleansim:
 	@cd ./work && rm -rf simv* csrc ucli.key *.vcs.log novas_dump.log *.fsdb
 cleanVerilator:

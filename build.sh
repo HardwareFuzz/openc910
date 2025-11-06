@@ -4,7 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${ROOT_DIR}/build_result"
 
-THREADS="${THREADS:-4}"
+# Auto-detect number of CPU cores, fallback to 4 if detection fails
+NPROC_CORES="$(nproc --all 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)"
+THREADS="${THREADS:-${NPROC_CORES}}"
 # Set DEBUG_PC_TRACE=1 to enable detailed PC trace debugging (default: 0 = only show COMMIT)
 DEBUG_PC_TRACE="${DEBUG_PC_TRACE:-0}"
 # Set DISABLE_ALL_FUSION=1 to disable all instruction fusion (default: 1 = disabled for debugging)
@@ -15,7 +17,7 @@ REG_WRITE_LOG="${REG_WRITE_LOG:-1}"
 REG_WRITE_DBG="${REG_WRITE_DBG:-0}"
 
 # Build SIM_OPT based on flags
-SIM_OPT_BASE="-x-assign 0 -Wno-fatal --threads ${THREADS} -Wno-TIMESCALEMOD --timing"
+SIM_OPT_BASE="-x-assign 0 -Wno-fatal --threads ${THREADS} --verilate-jobs ${THREADS} -j ${THREADS} -Wno-TIMESCALEMOD --timing"
 if [ "$DEBUG_PC_TRACE" = "1" ]; then
   SIM_OPT_BASE="-DDEBUG_PC_TRACE ${SIM_OPT_BASE}"
 fi
@@ -40,7 +42,7 @@ export SREC2VMEM="${SREC2VMEM:-${ROOT_DIR}/smart_run/tests/bin/Srec2vmem}"
 echo "[build] CODE_BASE_PATH=${CODE_BASE_PATH}"
 echo "[build] TOOL_EXTENSION=${TOOL_EXTENSION}"
 echo "[build] SREC2VMEM=${SREC2VMEM}"
-echo "[build] THREADS=${THREADS}"
+echo "[build] THREADS=${THREADS} (detected ${NPROC_CORES} cores)"
 echo "[build] SIM_OPT=${SIM_OPT}"
 echo "[build] REG_WRITE_LOG=${REG_WRITE_LOG} (adds -DC910_LOGGER)"
 echo "[build] REG_WRITE_DBG=${REG_WRITE_DBG} (adds -DC910_DBG_XWB)"
@@ -57,7 +59,8 @@ mkdir -p "${ROOT_DIR}/smart_run/work"
   echo "[build] Resolved filelist -> ${DST_FL}"
   make -C "${ROOT_DIR}/smart_run" cleanVerilator
   ENABLE_COMMIT_LOG=1 make -C "${ROOT_DIR}/smart_run" compile SIM=verilator THREADS="${THREADS}" SIMULATOR_OPT="${SIM_OPT}"
-  ENABLE_COMMIT_LOG=1 make -C "${ROOT_DIR}/smart_run" buildVerilator
+  # Use parallel make with all available cores for building the C++ files
+  ENABLE_COMMIT_LOG=1 make -j"${THREADS}" -C "${ROOT_DIR}/smart_run" buildVerilator
 )
 
 VTOP_SRC="${ROOT_DIR}/smart_run/work/obj_dir/Vtop"

@@ -1,8 +1,9 @@
+[sim_main1] Using 128 verilator thread(s)
 	********* Init Program *********
 	********* Wipe memory to 0 *********
 	********* Read program *********
-	********* Using inst file: /tmp/c910_66vEjn/inst.pat *********
-	********* Using data file: /tmp/c910_66vEjn/data.pat *********
+	********* Using inst file: /tmp/c910_3Tjfxk/inst.pat *********
+	********* Using data file: /tmp/c910_3Tjfxk/data.pat *********
 	********* Load program to memory *********
 [DBG][X-SB] src=cp0_ex3 preg=32 data=0x0000000000000000
 [DBG][X-SB] src=iu_pipe0 preg=32 data=0x0000000000000000
