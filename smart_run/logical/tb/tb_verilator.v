@@ -180,6 +180,9 @@ module top(
   integer j;
   initial
   begin
+`ifdef C910_DEBUG_BOOT
+    $display("[BOOT] Enter initial loader");
+`endif
     $display("\t********* Init Program *********");
     $display("\t********* Wipe memory to 0 *********");
     for(i=0; i < 32'h16384; i=i+1)
@@ -200,6 +203,10 @@ module top(
       `RTL_MEM.ram13.mem[i][7:0] = 8'h0;
       `RTL_MEM.ram14.mem[i][7:0] = 8'h0;
       `RTL_MEM.ram15.mem[i][7:0] = 8'h0;
+`ifdef C910_DEBUG_BOOT
+      if ((i & 16'h0FFF) == 0)
+        $display("[BOOT][wipe] i=0x%0h/0x16384", i);
+`endif
     end
   
     inst_pat_path = "inst.pat";
@@ -207,11 +214,26 @@ module top(
     void'($value$plusargs("INST=%s", inst_pat_path));
     void'($value$plusargs("DATA=%s", data_pat_path));
 
+`ifdef C910_DEBUG_BOOT
+    begin
+      integer f_inst, f_data;
+      f_inst = $fopen(inst_pat_path, "r");
+      f_data = $fopen(data_pat_path, "r");
+      if (f_inst == 0) $display("[BOOT][ERR] cannot open inst pat: %s", inst_pat_path);
+      else begin $display("[BOOT] inst pat opened: %s", inst_pat_path); $fclose(f_inst); end
+      if (f_data == 0) $display("[BOOT][ERR] cannot open data pat: %s", data_pat_path);
+      else begin $display("[BOOT] data pat opened: %s", data_pat_path); $fclose(f_data); end
+    end
+`endif
     $display("\t********* Read program *********");
     $display("\t********* Using inst file: %s *********", inst_pat_path);
     $display("\t********* Using data file: %s *********", data_pat_path);
     $readmemh(inst_pat_path, mem_inst_temp);
     $readmemh(data_pat_path, mem_data_temp);
+`ifdef C910_DEBUG_BOOT
+    $display("[BOOT] readmemh done, mem_inst_temp[0]=0x%08x mem_data_temp[0]=0x%08x",
+             mem_inst_temp[0], mem_data_temp[0]);
+`endif
   
     $display("\t********* Load program to memory *********");
     i=0;
@@ -237,6 +259,10 @@ module top(
       `RTL_MEM.ram14.mem[i][7:0] = mem_inst_temp[j][15: 8];
       `RTL_MEM.ram15.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
       j = j+1;
+`ifdef C910_DEBUG_BOOT
+      if ((j & 16'h1FFF) == 0)
+        $display("[BOOT][inst copy] j=0x%0h i=0x%0h", j, i);
+`endif
     end
     i=0;
     for(j=0;i<32'h4000;i=j/4)
@@ -261,8 +287,48 @@ module top(
       `RTL_MEM.ram14.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
       `RTL_MEM.ram15.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
       j = j+1;
+`ifdef C910_DEBUG_BOOT
+      if ((j & 16'h1FFF) == 0)
+        $display("[BOOT][data copy] j=0x%0h i=0x%0h", j, i);
+`endif
     end
+`ifdef C910_DEBUG_BOOT
+    $display("[BOOT] program load done");
+`endif
   end
+
+`ifdef C910_DEBUG_BOOT
+  // --------- Run-phase debug heartbeats &关键信号边沿 ----------
+  reg rst_b_d, cpu_rst_d, clk_en_d;
+  integer hb_ct;
+  initial begin
+    rst_b_d  = 1'b1;
+    cpu_rst_d= 1'b1;
+    clk_en_d = 1'b0;
+    hb_ct    = 0;
+  end
+  always @(posedge clk) begin
+    hb_ct <= hb_ct + 1;
+    if (rst_b_d !== rst_b) begin
+      $display("[BOOT][edge] rst_b <= %0d @hb=%0d", rst_b, hb_ct);
+      rst_b_d <= rst_b;
+    end
+    if (cpu_rst_d !== `CPU_RST) begin
+      $display("[BOOT][edge] CPU_RST <= %0d @hb=%0d", `CPU_RST, hb_ct);
+      cpu_rst_d <= `CPU_RST;
+    end
+    if (clk_en_d !== `clk_en) begin
+      $display("[BOOT][edge] clk_en <= %0d @hb=%0d", `clk_en, hb_ct);
+      clk_en_d <= `clk_en;
+    end
+    if ((hb_ct % 100000) == 0) begin
+      $display("[BOOT][hb] hb_ct=%0d rst_b=%0d CPU_RST=%0d clk_en=%0d", hb_ct, rst_b, `CPU_RST, `clk_en);
+    end
+    if (`tb_retire0) $display("[BOOT][rt] slot0 retire pc=0x%010h", `retire0_pc);
+    if (`tb_retire1) $display("[BOOT][rt] slot1 retire pc=0x%010h", `retire1_pc);
+    if (`tb_retire2) $display("[BOOT][rt] slot2 retire pc=0x%010h", `retire2_pc);
+  end
+`endif
 
   integer clkCnt;
   always@(posedge clk) begin
@@ -1076,5 +1142,16 @@ module top(
     end
   end
 `endif
+
+  // ------------------------------------------------------------------
+  // Minimal keep-alive: keep key gating/retire signals observed even
+  // when BOOT_DEBUG_LOG is off, to avoid DCE/scheduling differences.
+  // No side effects (no prints), negligible overhead.
+  // ------------------------------------------------------------------
+  reg _ka_ff;
+  wire _ka_mix = rst_b ^ `CPU_RST ^ `clk_en ^ `tb_retire0 ^ `tb_retire1 ^ `tb_retire2;
+  always @(posedge clk) begin
+    _ka_ff <= _ka_mix ^ _ka_ff;
+  end
   
 endmodule

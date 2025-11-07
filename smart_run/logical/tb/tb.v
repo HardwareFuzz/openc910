@@ -965,4 +965,15 @@ module tb();
   `undef PREGFILE
 `endif
   
+  // ------------------------------------------------------------------
+  // Minimal keep-alive: keep key gating/retire signals observed even
+  // when BOOT_DEBUG_LOG is off, to avoid DCE/scheduling differences.
+  // No side effects (no prints), negligible overhead.
+  // ------------------------------------------------------------------
+  reg _ka_ff;
+  wire _ka_mix = rst_b ^ `CPU_RST ^ `clk_en ^ `tb_retire0 ^ `tb_retire1 ^ `tb_retire2;
+  always @(posedge clk) begin
+    _ka_ff <= _ka_mix ^ _ka_ff;
+  end
+  
 endmodule

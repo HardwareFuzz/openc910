@@ -1,761 +1,328 @@
-[sim_main1] Using 128 verilator thread(s)
 	********* Init Program *********
 	********* Wipe memory to 0 *********
 	********* Read program *********
-	********* Using inst file: /tmp/c910_3Tjfxk/inst.pat *********
-	********* Using data file: /tmp/c910_3Tjfxk/data.pat *********
+	********* Using inst file: /tmp/c910_paJcLE/inst.pat *********
+	********* Using data file: /tmp/c910_paJcLE/data.pat *********
 	********* Load program to memory *********
-[DBG][X-SB] src=cp0_ex3 preg=32 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=32 data=0x0000000000000000
 [COMMIT] PC: 0x0000000000
-[DBG][X-SB] pc=0x0000000000 slot=0 preg=32 scoreboard hit data=0x0000000000000000
 [C910][X-WB] pc=0x0000000000 rd=x5 preg=32 data=0x0000000000000000
-[DBG][F-WARN] pc=0x0000000000 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000004
-[DBG][X-SB] src=iu_pipe0 preg=5 data=0x0000000000004000
-[DBG][X-SB] pc=0x0000000004 slot=0 preg=5 scoreboard=0x0000000000004000 PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000004 rd=x6 preg=5 data=0x0000000000004000
-[DBG][F-WARN] pc=0x0000000004 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000006
-[DBG][X-SB] src=iu_pipe1 preg=95 data=0x0000000000003fff
-[DBG][X-SB] pc=0x0000000006 slot=0 preg=95 scoreboard=0x0000000000003fff PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000006 rd=x6 preg=95 data=0x0000000000003fff
-[DBG][F-WARN] pc=0x0000000006 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000008
-[DBG][X-SB] src=iu_pipe0 preg=33 data=0x0000000000003fff
-[DBG][X-SB] pc=0x0000000008 slot=0 preg=33 scoreboard=0x0000000000003fff PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000008 rd=x5 preg=33 data=0x0000000000003fff
-[DBG][F-WARN] pc=0x0000000008 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000000
 [COMMIT] PC: 0x000000000c
-[DBG][X-WARN] pc=0x000000000c slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000000c slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe0 preg=5 data=0x0000000000000010
 [COMMIT] PC: 0x0000000010
-[DBG][X-SB] pc=0x0000000010 slot=0 preg=5 scoreboard hit data=0x0000000000000010
 [C910][X-WB] pc=0x0000000010 rd=x5 preg=5 data=0x0000000000000010
-[DBG][F-WARN] pc=0x0000000010 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000014
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000000000180
-[DBG][X-SB] pc=0x0000000014 slot=0 preg=94 scoreboard=0x0000000000000180 PRF=0x0000000000000000 (scoreboard wins)
-[C910][X-WB] pc=0x0000000014 rd=x5 preg=94 data=0x0000000000000180
-[DBG][F-WARN] pc=0x0000000014 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000000
+[C910][X-WB] pc=0x0000000014 rd=x5 preg=94 data=0x00000000000001c4
 [COMMIT] PC: 0x0000000018
-[DBG][X-WARN] pc=0x0000000018 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000018 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=5 data=0x0000000a00001900
-[DBG][X-SB] src=iu_pipe0 preg=5 data=0x0000000a00001900
 [COMMIT] PC: 0x000000001c
-[DBG][X-SB] pc=0x000000001c slot=0 preg=5 scoreboard hit data=0x0000000a00001900
 [C910][X-WB] pc=0x000000001c rd=x5 preg=5 data=0x0000000a00001900
-[DBG][F-WARN] pc=0x000000001c slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000020
-[DBG][X-SB] src=iu_pipe0 preg=6 data=0x0000000000003000
-[DBG][X-SB] pc=0x0000000020 slot=0 preg=6 scoreboard=0x0000000000003000 PRF=0x96f32fc71a8c885d (scoreboard wins)
 [C910][X-WB] pc=0x0000000020 rd=x6 preg=6 data=0x0000000000003000
-[DBG][F-WARN] pc=0x0000000020 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000022
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000a00003900
-[DBG][X-SB] pc=0x0000000022 slot=0 preg=94 scoreboard=0x0000000a00003900 PRF=0x0000000000000180 (scoreboard wins)
 [C910][X-WB] pc=0x0000000022 rd=x5 preg=94 data=0x0000000a00003900
-[DBG][F-WARN] pc=0x0000000022 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000a00001900
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000a00001900
 [COMMIT] PC: 0x0000000026
-[DBG][X-WARN] pc=0x0000000026 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000026 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000000
 [COMMIT] PC: 0x000000002a
-[DBG][X-WARN] pc=0x000000002a slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000002a slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000002e
-[DBG][X-WARN] pc=0x000000002e slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000002e slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000030
 [COMMIT] PC: 0x0000000034
-[DBG][X-SB] src=iu_pipe0 preg=5 data=0x00000000000000a5
-[DBG][X-SB] src=iu_pipe1 preg=95 data=0x0000000000449000
-[DBG][X-SB] pc=0x0000000030 slot=0 preg=5 scoreboard=0x00000000000000a5 PRF=0x0000000a00001900 (scoreboard wins)
 [C910][X-WB] pc=0x0000000030 rd=x15 preg=5 data=0x00000000000000a5
-[DBG][X-SB] pc=0x0000000034 slot=1 preg=95 scoreboard=0x0000000000449000 PRF=0x0000000000003fff (scoreboard wins)
 [C910][X-WB] pc=0x0000000034 rd=x16 preg=95 data=0x0000000000449000
-[DBG][F-WARN] pc=0x0000000030 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000034 slot=1 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000038
-[DBG][X-SB] src=iu_pipe0 preg=32 data=0x00000000004488cd
-[DBG][X-SB] pc=0x0000000038 slot=0 preg=32 scoreboard=0x00000000004488cd PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000038 rd=x16 preg=32 data=0x00000000004488cd
-[DBG][F-WARN] pc=0x0000000038 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000003c
-[DBG][X-SB] src=iu_pipe0 preg=34 data=0x0000001122334000
-[DBG][X-SB] pc=0x000000003c slot=0 preg=34 scoreboard=0x0000001122334000 PRF=0xab28a644b6cdacc6 (scoreboard wins)
 [C910][X-WB] pc=0x000000003c rd=x16 preg=34 data=0x0000001122334000
-[DBG][F-WARN] pc=0x000000003c slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000003e
-[DBG][X-SB] src=iu_pipe0 preg=36 data=0x0000001122334455
-[DBG][X-SB] pc=0x000000003e slot=0 preg=36 scoreboard=0x0000001122334455 PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x000000003e rd=x16 preg=36 data=0x0000001122334455
-[DBG][F-WARN] pc=0x000000003e slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000042
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0x0001122334455000
-[DBG][X-SB] pc=0x0000000042 slot=0 preg=93 scoreboard=0x0001122334455000 PRF=0xe4d7ae26d71a35b1 (scoreboard wins)
 [C910][X-WB] pc=0x0000000042 rd=x16 preg=93 data=0x0001122334455000
-[DBG][F-WARN] pc=0x0000000042 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000044
-[DBG][X-SB] src=iu_pipe0 preg=35 data=0x0001122334455667
-[DBG][X-SB] pc=0x0000000044 slot=0 preg=35 scoreboard=0x0001122334455667 PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000044 rd=x16 preg=35 data=0x0001122334455667
-[DBG][F-WARN] pc=0x0000000044 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000048
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0x1122334455667000
-[DBG][X-SB] pc=0x0000000048 slot=0 preg=15 scoreboard=0x1122334455667000 PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000048 rd=x16 preg=15 data=0x1122334455667000
-[DBG][F-WARN] pc=0x0000000048 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000004a
-[DBG][X-SB] src=iu_pipe1 preg=95 data=0x1122334455667788
-[DBG][X-SB] pc=0x000000004a slot=0 preg=95 scoreboard=0x1122334455667788 PRF=0x0000000000449000 (scoreboard wins)
 [C910][X-WB] pc=0x000000004a rd=x16 preg=95 data=0x1122334455667788
-[DBG][F-WARN] pc=0x000000004a slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000004e
-[DBG][X-SB] src=iu_pipe0 preg=32 data=0xfffffffffff6e000
-[DBG][X-SB] pc=0x000000004e slot=0 preg=32 scoreboard=0xfffffffffff6e000 PRF=0x00000000004488cd (scoreboard wins)
 [C910][X-WB] pc=0x000000004e rd=x17 preg=32 data=0xfffffffffff6e000
-[DBG][F-WARN] pc=0x000000004e slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000052
-[DBG][X-SB] src=iu_pipe1 preg=92 data=0xfffffffffff6e5d5
-[DBG][X-SB] pc=0x0000000052 slot=0 preg=92 scoreboard=0xfffffffffff6e5d5 PRF=0xedbff24688612bb5 (scoreboard wins)
 [C910][X-WB] pc=0x0000000052 rd=x17 preg=92 data=0xfffffffffff6e5d5
-[DBG][F-WARN] pc=0x0000000052 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000056
-[DBG][X-SB] src=iu_pipe0 preg=16 data=0xffffffff6e5d5000
-[DBG][X-SB] pc=0x0000000056 slot=0 preg=16 scoreboard=0xffffffff6e5d5000 PRF=0x79102082de444a4a (scoreboard wins)
 [C910][X-WB] pc=0x0000000056 rd=x17 preg=16 data=0xffffffff6e5d5000
-[DBG][F-WARN] pc=0x0000000056 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000058
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0xffffffff6e5d4c3b
-[DBG][X-SB] pc=0x0000000058 slot=0 preg=15 scoreboard=0xffffffff6e5d4c3b PRF=0x1122334455667000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000058 rd=x17 preg=15 data=0xffffffff6e5d4c3b
-[DBG][F-WARN] pc=0x0000000058 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000005c
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0xffffedcba9876000
-[DBG][X-SB] pc=0x000000005c slot=0 preg=93 scoreboard=0xffffedcba9876000 PRF=0x0001122334455000 (scoreboard wins)
 [C910][X-WB] pc=0x000000005c rd=x17 preg=93 data=0xffffedcba9876000
-[DBG][F-WARN] pc=0x000000005c slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000005e
-[DBG][X-SB] src=iu_pipe0 preg=35 data=0xffffedcba9876543
-[DBG][X-SB] pc=0x000000005e slot=0 preg=35 scoreboard=0xffffedcba9876543 PRF=0x0001122334455667 (scoreboard wins)
 [C910][X-WB] pc=0x000000005e rd=x17 preg=35 data=0xffffedcba9876543
-[DBG][F-WARN] pc=0x000000005e slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000062
-[DBG][X-SB] src=iu_pipe1 preg=91 data=0xfedcba9876543000
-[DBG][X-SB] pc=0x0000000062 slot=0 preg=91 scoreboard=0xfedcba9876543000 PRF=0x90683c339b92621c (scoreboard wins)
 [C910][X-WB] pc=0x0000000062 rd=x17 preg=91 data=0xfedcba9876543000
-[DBG][F-WARN] pc=0x0000000062 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000064
-[DBG][X-SB] src=iu_pipe0 preg=34 data=0xfedcba9876543210
-[DBG][X-SB] src=iu_pipe1 preg=92 data=0x1122334455667788
-[DBG][X-SB] pc=0x0000000064 slot=0 preg=34 scoreboard=0xfedcba9876543210 PRF=0x0000001122334000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000064 rd=x17 preg=34 data=0xfedcba9876543210
-[DBG][F-WARN] pc=0x0000000064 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000068
 [COMMIT] PC: 0x000000006c
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0x000000000000014a
-[DBG][X-SB] pc=0x0000000068 slot=0 preg=15 scoreboard=0x000000000000014a PRF=0xffffffff6e5d4c3b (scoreboard wins)
 [C910][X-WB] pc=0x0000000068 rd=x8 preg=15 data=0x000000000000014a
-[DBG][X-SB] pc=0x000000006c slot=1 preg=92 scoreboard hit data=0x1122334455667788
 [C910][X-WB] pc=0x000000006c rd=x9 preg=92 data=0x1122334455667788
-[DBG][F-WARN] pc=0x0000000068 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000006c slot=1 no PST entry matched, skipping
 [COMMIT] PC: 0x000000006e
 [COMMIT] PC: 0x0000000072
-[DBG][X-SB] src=iu_pipe0 preg=17 data=0xfedcba9876543211
-[DBG][X-SB] src=iu_pipe1 preg=90 data=0x0000000001111000
-[DBG][X-SB] pc=0x000000006e slot=0 preg=17 scoreboard=0xfedcba9876543211 PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x000000006e rd=x18 preg=17 data=0xfedcba9876543211
-[DBG][X-SB] pc=0x0000000072 slot=1 preg=90 scoreboard=0x0000000001111000 PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000072 rd=x9 preg=90 data=0x0000000001111000
-[DBG][F-WARN] pc=0x000000006e slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000072 slot=1 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000076
-[DBG][X-SB] src=iu_pipe0 preg=16 data=0x0000000001111111
-[DBG][X-SB] pc=0x0000000076 slot=0 preg=16 scoreboard=0x0000000001111111 PRF=0xffffffff6e5d5000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000076 rd=x9 preg=16 data=0x0000000001111111
-[DBG][F-WARN] pc=0x0000000076 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000007a
-[DBG][X-SB] src=iu_pipe0 preg=8 data=0x0000001111111000
-[DBG][X-SB] pc=0x000000007a slot=0 preg=8 scoreboard=0x0000001111111000 PRF=0x1e15ea1dfc2e6152 (scoreboard wins)
 [C910][X-WB] pc=0x000000007a rd=x9 preg=8 data=0x0000001111111000
-[DBG][F-WARN] pc=0x000000007a slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000007c
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0x0000001111111111
-[DBG][X-SB] pc=0x000000007c slot=0 preg=93 scoreboard=0x0000001111111111 PRF=0xffffedcba9876000 (scoreboard wins)
 [C910][X-WB] pc=0x000000007c rd=x9 preg=93 data=0x0000001111111111
-[DBG][F-WARN] pc=0x000000007c slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000080
-[DBG][X-SB] src=iu_pipe0 preg=32 data=0x0001111111111000
-[DBG][X-SB] pc=0x0000000080 slot=0 preg=32 scoreboard=0x0001111111111000 PRF=0xfffffffffff6e000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000080 rd=x9 preg=32 data=0x0001111111111000
-[DBG][F-WARN] pc=0x0000000080 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000082
-[DBG][X-SB] src=iu_pipe1 preg=91 data=0x0001111111111111
-[DBG][X-SB] pc=0x0000000082 slot=0 preg=91 scoreboard=0x0001111111111111 PRF=0xfedcba9876543000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000082 rd=x9 preg=91 data=0x0001111111111111
-[DBG][F-WARN] pc=0x0000000082 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000086
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0x1111111111111000
-[DBG][X-SB] src=iu_pipe1 preg=92 data=0x0000000001111000
-[DBG][X-SB] pc=0x0000000086 slot=0 preg=9 scoreboard=0x1111111111111000 PRF=0x0000000000000000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000086 rd=x9 preg=9 data=0x1111111111111000
-[DBG][F-WARN] pc=0x0000000086 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000088
 [COMMIT] PC: 0x000000008c
-[DBG][X-SB] src=iu_pipe0 preg=8 data=0x1111111111111111
-[DBG][X-SB] pc=0x0000000088 slot=0 preg=8 scoreboard=0x1111111111111111 PRF=0x0000001111111000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000088 rd=x9 preg=8 data=0x1111111111111111
-[DBG][X-SB] pc=0x000000008c slot=1 preg=92 scoreboard hit data=0x0000000001111000
 [C910][X-WB] pc=0x000000008c rd=x18 preg=92 data=0x0000000001111000
-[DBG][F-WARN] pc=0x0000000088 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000008c slot=1 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000090
-[DBG][X-SB] src=iu_pipe0 preg=18 data=0x0000000001111111
-[DBG][X-SB] pc=0x0000000090 slot=0 preg=18 scoreboard=0x0000000001111111 PRF=0x478a210a93646b97 (scoreboard wins)
 [C910][X-WB] pc=0x0000000090 rd=x18 preg=18 data=0x0000000001111111
-[DBG][F-WARN] pc=0x0000000090 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000094
-[DBG][X-SB] src=iu_pipe1 preg=90 data=0x0000001111111000
-[DBG][X-SB] pc=0x0000000094 slot=0 preg=90 scoreboard=0x0000001111111000 PRF=0x0000000001111000 (scoreboard wins)
 [C910][X-WB] pc=0x0000000094 rd=x18 preg=90 data=0x0000001111111000
-[DBG][F-WARN] pc=0x0000000094 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x0000000096
-[DBG][X-SB] src=iu_pipe0 preg=16 data=0x0000001111111111
-[DBG][X-SB] pc=0x0000000096 slot=0 preg=16 scoreboard=0x0000001111111111 PRF=0x0000000001111111 (scoreboard wins)
 [C910][X-WB] pc=0x0000000096 rd=x18 preg=16 data=0x0000001111111111
-[DBG][F-WARN] pc=0x0000000096 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000009a
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0x0001111111111000
-[DBG][X-SB] pc=0x000000009a slot=0 preg=9 scoreboard=0x0001111111111000 PRF=0x1111111111111000 (scoreboard wins)
 [C910][X-WB] pc=0x000000009a rd=x18 preg=9 data=0x0001111111111000
-[DBG][F-WARN] pc=0x000000009a slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000009c
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0x0001111111111111
-[DBG][X-SB] pc=0x000000009c slot=0 preg=93 scoreboard=0x0001111111111111 PRF=0x0000001111111111 (scoreboard wins)
 [C910][X-WB] pc=0x000000009c rd=x18 preg=93 data=0x0001111111111111
-[DBG][F-WARN] pc=0x000000009c slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000a0
-[DBG][X-SB] src=iu_pipe0 preg=32 data=0x2222222222222000
-[DBG][X-SB] pc=0x00000000a0 slot=0 preg=32 scoreboard=0x2222222222222000 PRF=0x0001111111111000 (scoreboard wins)
 [C910][X-WB] pc=0x00000000a0 rd=x18 preg=32 data=0x2222222222222000
-[DBG][F-WARN] pc=0x00000000a0 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000a2
-[DBG][X-SB] src=iu_pipe1 preg=91 data=0x2222222222222222
-[DBG][X-SB] pc=0x00000000a2 slot=0 preg=91 scoreboard=0x2222222222222222 PRF=0x0001111111111111 (scoreboard wins)
 [C910][X-WB] pc=0x00000000a2 rd=x18 preg=91 data=0x2222222222222222
-[DBG][F-WARN] pc=0x00000000a2 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000a6
-[DBG][X-SB] src=iu_pipe0 preg=17 data=0x3333333333333333
-[DBG][X-SB] pc=0x00000000a6 slot=0 preg=17 scoreboard=0x3333333333333333 PRF=0xfedcba9876543211 (scoreboard wins)
 [C910][X-WB] pc=0x00000000a6 rd=x19 preg=17 data=0x3333333333333333
-[DBG][F-WARN] pc=0x00000000a6 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000aa
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0x00000000000001d0
-[DBG][X-SB] pc=0x00000000aa slot=0 preg=9 scoreboard=0x00000000000001d0 PRF=0x0001111111111000 (scoreboard wins)
-[C910][X-WB] pc=0x00000000aa rd=x5 preg=9 data=0x00000000000001d0
-[DBG][F-WARN] pc=0x00000000aa slot=0 no PST entry matched, skipping
+[C910][X-WB] pc=0x00000000aa rd=x5 preg=9 data=0x0000000000000218
 [COMMIT] PC: 0x00000000ae
-[DBG][X-WARN] pc=0x00000000ae slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000000ae slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000b2
-[DBG][X-WARN] pc=0x00000000b2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000000b2 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000b6
-[DBG][X-WARN] pc=0x00000000b6 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000000b6 slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000ba
-[DBG][X-WARN] pc=0x00000000ba slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000000ba slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000be
-[DBG][X-SB] src=iu_pipe0 preg=18 data=0x00000000000003ff
-[DBG][X-SB] pc=0x00000000be slot=0 preg=18 scoreboard=0x00000000000003ff PRF=0x0000000001111111 (scoreboard wins)
-[C910][X-WB] pc=0x00000000be rd=x28 preg=18 data=0x00000000000003ff
-[DBG][F-WARN] pc=0x00000000be slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x00000000c2
-[DBG][X-SB] src=iu_pipe1 preg=92 data=0x3ff0000000000000
-[DBG][X-SB] pc=0x00000000c2 slot=0 preg=92 scoreboard=0x3ff0000000000000 PRF=0x0000000001111000 (scoreboard wins)
-[C910][X-WB] pc=0x00000000c2 rd=x28 preg=92 data=0x3ff0000000000000
-[DBG][F-WARN] pc=0x00000000c2 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000000c4
-[DBG][X-WARN] pc=0x00000000c4 slot=0 no PST entry matched, skipping
-[DBG][F-SB] pc=0x00000000c4 slot=0 vreg=33 scoreboard miss, deferring until WB data arrives
-[DBG][X-SB] src=iu_pipe0 preg=94 data=0x0000000000001000
-[COMMIT] PC: 0x00000000c8
+[C910][X-WB] pc=0x00000000be rd=x29 preg=18 data=0x0000000000000258
+[C910][X-WB] pc=0x00000000c2 rd=x30 preg=92 data=0x0000000000092000
+[COMMIT] PC: 0x00000000c6
+[C910][X-WB] pc=0x00000000c6 rd=x30 preg=16 data=0x0000000000091a2b
+[COMMIT] PC: 0x00000000ca
+[C910][X-WB] pc=0x00000000ca rd=x30 preg=19 data=0x0000000091a2b000
 [COMMIT] PC: 0x00000000cc
-[DBG][F-SB] src=vfpu_pipe6 vreg=33 data=0x3ff0000000000000
-[DBG][F-SB] pc=0x00000000c4 slot=0 vreg=33 scoreboard=0x3ff0000000000000 VREG=0x0bfdee84ba39647f (scoreboard wins)
-[C910][F-WB] pc=0x00000000c4 rd=f0 vreg=33 data=0x3ff0000000000000
-[DBG][X-WARN] pc=0x00000000c8 slot=0 no PST entry matched, skipping
-[DBG][X-SB] pc=0x00000000cc slot=1 preg=94 scoreboard hit data=0x0000000000001000
-[C910][X-WB] pc=0x00000000cc rd=x28 preg=94 data=0x0000000000001000
-[DBG][F-SB] pc=0x00000000c8 slot=0 vreg=32 scoreboard miss, deferring until WB data arrives
-[DBG][F-WARN] pc=0x00000000cc slot=1 no PST entry matched, skipping
-[DBG][F-SB] src=vfpu_pipe6 vreg=32 data=0x4000000000000000
-[DBG][F-SB] pc=0x00000000c8 slot=0 vreg=32 scoreboard=0x4000000000000000 VREG=0x26815d3f5f143625 (scoreboard wins)
-[C910][F-WB] pc=0x00000000c8 rd=f1 vreg=32 data=0x4000000000000000
-[COMMIT] PC: 0x00000000ce
-[DBG][X-SB] src=iu_pipe0 preg=19 data=0x0000000000000801
-[DBG][X-SB] pc=0x00000000ce slot=0 preg=19 scoreboard=0x0000000000000801 PRF=0x338cca59663a004b (scoreboard wins)
-[C910][X-WB] pc=0x00000000ce rd=x28 preg=19 data=0x0000000000000801
-[DBG][F-WARN] pc=0x00000000ce slot=0 no PST entry matched, skipping
+[C910][X-WB] pc=0x00000000cc rd=x30 preg=94 data=0x0000000091a2b3c5
+[COMMIT] PC: 0x00000000d0
+[C910][X-WB] pc=0x00000000d0 rd=x30 preg=35 data=0x000012345678a000
 [COMMIT] PC: 0x00000000d2
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0x4008000000000000
-[DBG][X-SB] pc=0x00000000d2 slot=0 preg=93 scoreboard=0x4008000000000000 PRF=0x0001111111111111 (scoreboard wins)
-[C910][X-WB] pc=0x00000000d2 rd=x28 preg=93 data=0x4008000000000000
-[DBG][F-WARN] pc=0x00000000d2 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000000d4
-[DBG][X-WARN] pc=0x00000000d4 slot=0 no PST entry matched, skipping
-[DBG][F-SB] pc=0x00000000d4 slot=0 vreg=35 scoreboard miss, deferring until WB data arrives
+[C910][X-WB] pc=0x00000000d2 rd=x30 preg=93 data=0x0000123456789abd
+[COMMIT] PC: 0x00000000d6
+[C910][X-WB] pc=0x00000000d6 rd=x30 preg=32 data=0x0123456789abd000
 [COMMIT] PC: 0x00000000d8
+[C910][X-WB] pc=0x00000000d8 rd=x30 preg=16 data=0x0123456789abcdef
 [COMMIT] PC: 0x00000000dc
-[DBG][F-SB] src=vfpu_pipe6 vreg=35 data=0x4008000000000000
-[DBG][F-SB] pc=0x00000000d4 slot=0 vreg=35 scoreboard=0x4008000000000000 VREG=0xa0188749cd0fd45b (scoreboard wins)
-[C910][F-WB] pc=0x00000000d4 rd=f2 vreg=35 data=0x4008000000000000
-[DBG][X-WARN] pc=0x00000000d8 slot=0 no PST entry matched, skipping
-[DBG][X-WARN] pc=0x00000000dc slot=1 no PST entry matched, skipping
-[DBG][F-SB] pc=0x00000000d8 slot=0 vreg=34 scoreboard miss, deferring until WB data arrives
-[DBG][F-WARN] pc=0x00000000dc slot=1 no PST entry matched, skipping
-[DBG][F-SB] src=vfpu_pipe6 vreg=34 data=0x4018000000000000
-[DBG][F-SB] pc=0x00000000d8 slot=0 vreg=34 scoreboard=0x4018000000000000 VREG=0xcf117b3e2a3c735a (scoreboard wins)
-[C910][F-WB] pc=0x00000000d8 rd=f3 vreg=34 data=0x4018000000000000
-[DBG][X-SB] src=iu_pipe1 preg=92 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000000000001
 [COMMIT] PC: 0x00000000e0
-[COMMIT] PC: 0x00000000e4
-[DBG][X-WARN] pc=0x00000000e0 slot=0 no PST entry matched, skipping
-[DBG][X-SB] pc=0x00000000e4 slot=1 preg=92 scoreboard hit data=0x0000000000000000
-[C910][X-WB] pc=0x00000000e4 rd=x8 preg=92 data=0x0000000000000000
-[DBG][F-WARN] pc=0x00000000e0 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000000e4 slot=1 no PST entry matched, skipping
-[COMMIT] PC: 0x00000000e6 (EXCEPTION)
-[DBG][X-SB] src=cp0_ex3 preg=15 data=0x00000000000000e6
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0x00000000000000e6
-[COMMIT] PC: 0x0000000180
-[DBG][X-SB] pc=0x0000000180 slot=0 preg=15 scoreboard hit data=0x00000000000000e6
-[C910][X-WB] pc=0x0000000180 rd=x5 preg=15 data=0x00000000000000e6
-[DBG][F-WARN] pc=0x0000000180 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=9 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0x0000000000000002
-[COMMIT] PC: 0x0000000184
-[DBG][X-SB] pc=0x0000000184 slot=0 preg=9 scoreboard hit data=0x0000000000000002
-[C910][X-WB] pc=0x0000000184 rd=x6 preg=9 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000184 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=6 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=6 data=0x0000000000000000
-[COMMIT] PC: 0x0000000188
-[DBG][X-SB] pc=0x0000000188 slot=0 preg=6 scoreboard hit data=0x0000000000000000
-[C910][X-WB] pc=0x0000000188 rd=x29 preg=6 data=0x0000000000000000
-[DBG][F-WARN] pc=0x0000000188 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x000000018c
-[DBG][X-SB] src=iu_pipe0 preg=16 data=0x0000000000000004
-[DBG][X-SB] pc=0x000000018c slot=0 preg=16 scoreboard=0x0000000000000004 PRF=0x0000001111111111 (scoreboard wins)
-[C910][X-WB] pc=0x000000018c rd=x30 preg=16 data=0x0000000000000004
-[DBG][F-WARN] pc=0x000000018c slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000190
-[COMMIT] PC: 0x0000000194
-[DBG][X-SB] src=iu_pipe0 preg=28 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000190 slot=0 preg=28 scoreboard=0x0000000000000002 PRF=0x40ceb148d066b094 (scoreboard wins)
-[C910][X-WB] pc=0x0000000190 rd=x6 preg=28 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000194 slot=1 preg=94 scoreboard=0x0000000000000002 PRF=0x0000000000000001 (scoreboard wins)
-[C910][X-WB] pc=0x0000000194 rd=x7 preg=94 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000190 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000194 slot=1 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000196
-[DBG][X-SB] src=iu_pipe0 preg=18 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000196 slot=0 preg=18 scoreboard=0x0000000000000002 PRF=0x00000000000003ff (scoreboard wins)
-[C910][X-WB] pc=0x0000000196 rd=x28 preg=18 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000196 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe0 preg=90 data=0x0000000000000001
-[COMMIT] PC: 0x0000000198
-[DBG][X-WARN] pc=0x0000000198 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000198 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ac
-[DBG][X-SB] src=iu_pipe0 preg=7 data=0x0000000000000000
-[DBG][X-SB] pc=0x00000001ac slot=0 preg=7 scoreboard hit data=0x0000000000000000
-[C910][X-WB] pc=0x00000001ac rd=x29 preg=7 data=0x0000000000000000
-[DBG][F-WARN] pc=0x00000001ac slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001b0
-[DBG][X-SB] src=iu_pipe0 preg=29 data=0x0000000000000003
-[DBG][X-SB] src=iu_pipe1 preg=9 data=0x0000000000000004
-[DBG][X-SB] pc=0x00000001b0 slot=0 preg=29 scoreboard=0x0000000000000003 PRF=0x0000000000000000 (scoreboard wins)
-[C910][X-WB] pc=0x00000001b0 rd=x28 preg=29 data=0x0000000000000003
-[DBG][F-WARN] pc=0x00000001b0 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001b2
-[DBG][X-WARN] pc=0x00000001b2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001b2 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ba
-[DBG][X-SB] src=iu_pipe0 preg=6 data=0x0000000000000002
-[DBG][X-SB] pc=0x00000001ba slot=0 preg=6 scoreboard=0x0000000000000002 PRF=0x0000000000000000 (scoreboard wins)
-[C910][X-WB] pc=0x00000001ba rd=x7 preg=6 data=0x0000000000000002
-[DBG][F-WARN] pc=0x00000001ba slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001bc
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0x00000000000000e8
-[DBG][X-SB] pc=0x00000001bc slot=0 preg=93 scoreboard=0x00000000000000e8 PRF=0x4008000000000000 (scoreboard wins)
-[C910][X-WB] pc=0x00000001bc rd=x5 preg=93 data=0x00000000000000e8
-[DBG][F-WARN] pc=0x00000001bc slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x00000000000000e6
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x00000000000000e6
-[COMMIT] PC: 0x00000001be
-[DBG][X-WARN] pc=0x00000001be slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001be slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000002
-[COMMIT] PC: 0x00000001c2
-[DBG][X-WARN] pc=0x00000001c2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001c2 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000000
-[COMMIT] PC: 0x00000001c6
-[DBG][X-WARN] pc=0x00000001c6 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001c6 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ca
-[DBG][X-WARN] pc=0x00000001ca slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001ca slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000000000001
-[COMMIT] PC: 0x00000000e8 (EXCEPTION)
-[DBG][X-SB] src=cp0_ex3 preg=9 data=0x00000000000000e8
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0x00000000000000e8
-[COMMIT] PC: 0x0000000180
-[DBG][X-SB] pc=0x0000000180 slot=0 preg=9 scoreboard hit data=0x00000000000000e8
-[C910][X-WB] pc=0x0000000180 rd=x5 preg=9 data=0x00000000000000e8
-[DBG][F-WARN] pc=0x0000000180 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=15 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0x0000000000000002
-[COMMIT] PC: 0x0000000184
-[DBG][X-SB] pc=0x0000000184 slot=0 preg=15 scoreboard hit data=0x0000000000000002
-[C910][X-WB] pc=0x0000000184 rd=x6 preg=15 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000184 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=18 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=18 data=0x0000000000000000
-[COMMIT] PC: 0x0000000188
-[DBG][X-SB] pc=0x0000000188 slot=0 preg=18 scoreboard hit data=0x0000000000000000
-[C910][X-WB] pc=0x0000000188 rd=x29 preg=18 data=0x0000000000000000
-[DBG][F-WARN] pc=0x0000000188 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x000000018c
-[DBG][X-SB] src=iu_pipe0 preg=7 data=0x0000000000000004
-[DBG][X-SB] pc=0x000000018c slot=0 preg=7 scoreboard=0x0000000000000004 PRF=0x0000000000000000 (scoreboard wins)
-[C910][X-WB] pc=0x000000018c rd=x30 preg=7 data=0x0000000000000004
-[DBG][F-WARN] pc=0x000000018c slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000190
-[COMMIT] PC: 0x0000000194
-[DBG][X-SB] src=iu_pipe0 preg=30 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000190 slot=0 preg=30 scoreboard=0x0000000000000002 PRF=0xbf05ada99443255f (scoreboard wins)
-[C910][X-WB] pc=0x0000000190 rd=x6 preg=30 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000194 slot=1 preg=94 scoreboard=0x0000000000000002 PRF=0x0000000000000001 (scoreboard wins)
-[C910][X-WB] pc=0x0000000194 rd=x7 preg=94 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000190 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000194 slot=1 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000196
-[DBG][X-SB] src=iu_pipe0 preg=19 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000196 slot=0 preg=19 scoreboard=0x0000000000000002 PRF=0x0000000000000801 (scoreboard wins)
-[C910][X-WB] pc=0x0000000196 rd=x28 preg=19 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000196 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe0 preg=93 data=0x0000000000000001
-[COMMIT] PC: 0x0000000198
-[DBG][X-WARN] pc=0x0000000198 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000198 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ac
-[DBG][X-SB] src=iu_pipe0 preg=6 data=0x0000000000000000
-[DBG][X-SB] pc=0x00000001ac slot=0 preg=6 scoreboard=0x0000000000000000 PRF=0x0000000000000002 (scoreboard wins)
-[C910][X-WB] pc=0x00000001ac rd=x29 preg=6 data=0x0000000000000000
-[DBG][F-WARN] pc=0x00000001ac slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001b0
-[DBG][X-SB] src=iu_pipe0 preg=28 data=0x0000000000000003
-[DBG][X-SB] src=iu_pipe1 preg=15 data=0x0000000000000004
-[DBG][X-SB] pc=0x00000001b0 slot=0 preg=28 scoreboard=0x0000000000000003 PRF=0x0000000000000002 (scoreboard wins)
-[C910][X-WB] pc=0x00000001b0 rd=x28 preg=28 data=0x0000000000000003
-[DBG][F-WARN] pc=0x00000001b0 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001b2
-[DBG][X-WARN] pc=0x00000001b2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001b2 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ba
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0x0000000000000002
-[DBG][X-SB] pc=0x00000001ba slot=0 preg=15 scoreboard=0x0000000000000002 PRF=0x0000000000000004 (scoreboard wins)
-[C910][X-WB] pc=0x00000001ba rd=x7 preg=15 data=0x0000000000000002
-[DBG][F-WARN] pc=0x00000001ba slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001bc
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0x00000000000000ea
-[DBG][X-SB] pc=0x00000001bc slot=0 preg=93 scoreboard=0x00000000000000ea PRF=0x0000000000000001 (scoreboard wins)
-[C910][X-WB] pc=0x00000001bc rd=x5 preg=93 data=0x00000000000000ea
-[DBG][F-WARN] pc=0x00000001bc slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x00000000000000e8
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x00000000000000e8
-[COMMIT] PC: 0x00000001be
-[DBG][X-WARN] pc=0x00000001be slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001be slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000002
-[COMMIT] PC: 0x00000001c2
-[DBG][X-WARN] pc=0x00000001c2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001c2 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000000
-[COMMIT] PC: 0x00000001c6
-[DBG][X-WARN] pc=0x00000001c6 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001c6 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ca
-[DBG][X-WARN] pc=0x00000001ca slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001ca slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000000ea
-[DBG][X-SB] src=iu_pipe1 preg=9 data=0x0000000000000001
-[DBG][X-SB] pc=0x00000000ea slot=0 preg=9 scoreboard=0x0000000000000001 PRF=0x00000000000000e8 (scoreboard wins)
-[C910][X-WB] pc=0x00000000ea rd=x8 preg=9 data=0x0000000000000001
-[DBG][F-WARN] pc=0x00000000ea slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000000ec (EXCEPTION)
-[DBG][X-SB] src=iu_pipe0 preg=16 data=0x0000000000000002
-[DBG][X-SB] src=cp0_ex3 preg=16 data=0x00000000000000ec
-[DBG][X-SB] src=iu_pipe0 preg=16 data=0x00000000000000ec
-[COMMIT] PC: 0x0000000180
-[DBG][X-SB] pc=0x0000000180 slot=0 preg=16 scoreboard hit data=0x00000000000000ec
-[C910][X-WB] pc=0x0000000180 rd=x5 preg=16 data=0x00000000000000ec
-[DBG][F-WARN] pc=0x0000000180 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=18 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe0 preg=18 data=0x0000000000000002
-[COMMIT] PC: 0x0000000184
-[DBG][X-SB] pc=0x0000000184 slot=0 preg=18 scoreboard hit data=0x0000000000000002
-[C910][X-WB] pc=0x0000000184 rd=x6 preg=18 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000184 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=19 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=19 data=0x0000000000000000
-[COMMIT] PC: 0x0000000188
-[DBG][X-SB] pc=0x0000000188 slot=0 preg=19 scoreboard hit data=0x0000000000000000
-[C910][X-WB] pc=0x0000000188 rd=x29 preg=19 data=0x0000000000000000
-[DBG][F-WARN] pc=0x0000000188 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x000000018c
-[DBG][X-SB] src=iu_pipe0 preg=6 data=0x0000000000000004
-[DBG][X-SB] pc=0x000000018c slot=0 preg=6 scoreboard=0x0000000000000004 PRF=0x0000000000000000 (scoreboard wins)
-[C910][X-WB] pc=0x000000018c rd=x30 preg=6 data=0x0000000000000004
-[DBG][F-WARN] pc=0x000000018c slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000190
-[COMMIT] PC: 0x0000000194
-[DBG][X-SB] src=iu_pipe0 preg=32 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000190 slot=0 preg=32 scoreboard=0x0000000000000002 PRF=0x2222222222222000 (scoreboard wins)
-[C910][X-WB] pc=0x0000000190 rd=x6 preg=32 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000194 slot=1 preg=94 scoreboard hit data=0x0000000000000002
-[C910][X-WB] pc=0x0000000194 rd=x7 preg=94 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000190 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000194 slot=1 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000196
-[DBG][X-SB] src=iu_pipe0 preg=29 data=0x0000000000000002
-[DBG][X-SB] pc=0x0000000196 slot=0 preg=29 scoreboard=0x0000000000000002 PRF=0x0000000000000003 (scoreboard wins)
-[C910][X-WB] pc=0x0000000196 rd=x28 preg=29 data=0x0000000000000002
-[DBG][F-WARN] pc=0x0000000196 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe0 preg=93 data=0x0000000000000001
-[COMMIT] PC: 0x0000000198
-[DBG][X-WARN] pc=0x0000000198 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000198 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ac
-[DBG][X-SB] src=iu_pipe0 preg=7 data=0x0000000000000000
-[DBG][X-SB] pc=0x00000001ac slot=0 preg=7 scoreboard=0x0000000000000000 PRF=0x0000000000000004 (scoreboard wins)
-[C910][X-WB] pc=0x00000001ac rd=x29 preg=7 data=0x0000000000000000
-[DBG][F-WARN] pc=0x00000001ac slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001b0
-[DBG][X-SB] src=iu_pipe0 preg=28 data=0x0000000000000003
-[DBG][X-SB] src=iu_pipe1 preg=15 data=0x0000000000000004
-[DBG][X-SB] pc=0x00000001b0 slot=0 preg=28 scoreboard hit data=0x0000000000000003
-[C910][X-WB] pc=0x00000001b0 rd=x28 preg=28 data=0x0000000000000003
-[DBG][F-WARN] pc=0x00000001b0 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001b2
-[DBG][X-WARN] pc=0x00000001b2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001b2 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ba
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0x0000000000000002
-[DBG][X-SB] pc=0x00000001ba slot=0 preg=15 scoreboard=0x0000000000000002 PRF=0x0000000000000004 (scoreboard wins)
-[C910][X-WB] pc=0x00000001ba rd=x7 preg=15 data=0x0000000000000002
-[DBG][F-WARN] pc=0x00000001ba slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001bc
-[DBG][X-SB] src=iu_pipe1 preg=93 data=0x00000000000000ee
-[DBG][X-SB] pc=0x00000001bc slot=0 preg=93 scoreboard=0x00000000000000ee PRF=0x0000000000000001 (scoreboard wins)
-[C910][X-WB] pc=0x00000001bc rd=x5 preg=93 data=0x00000000000000ee
-[DBG][F-WARN] pc=0x00000001bc slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x00000000000000ec
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x00000000000000ec
-[COMMIT] PC: 0x00000001be
-[DBG][X-WARN] pc=0x00000001be slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001be slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000002
-[COMMIT] PC: 0x00000001c2
-[DBG][X-WARN] pc=0x00000001c2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001c2 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=cp0_ex3 preg=0 data=0x0000000000000000
-[DBG][X-SB] src=iu_pipe0 preg=0 data=0x0000000000000000
-[COMMIT] PC: 0x00000001c6
-[DBG][X-WARN] pc=0x00000001c6 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001c6 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000001ca
-[DBG][X-WARN] pc=0x00000001ca slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000001ca slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x00000000ee
-[DBG][X-SB] src=iu_pipe0 preg=16 data=0x0000000000000002
-[DBG][X-SB] pc=0x00000000ee slot=0 preg=16 scoreboard=0x0000000000000002 PRF=0x00000000000000ec (scoreboard wins)
-[C910][X-WB] pc=0x00000000ee rd=x8 preg=16 data=0x0000000000000002
-[DBG][F-WARN] pc=0x00000000ee slot=0 no PST entry matched, skipping
+[C910][X-WB] pc=0x00000000e0 rd=x31 preg=29 data=0x0000000000008000
+[COMMIT] PC: 0x00000000e2
+[C910][X-WB] pc=0x00000000e2 rd=x31 preg=92 data=0x0000000000007f77
+[COMMIT] PC: 0x00000000e6
+[C910][X-WB] pc=0x00000000e6 rd=x31 preg=19 data=0x00000000feee0000
+[COMMIT] PC: 0x00000000e8
+[C910][X-WB] pc=0x00000000e8 rd=x31 preg=30 data=0x00000000feedface
+[COMMIT] PC: 0x00000000ec
 [COMMIT] PC: 0x00000000f0
-[DBG][X-SB] src=iu_pipe0 preg=29 data=0x0000000000000002
-[DBG][X-SB] src=iu_pipe1 preg=18 data=0xfffffffffdeae000
-[DBG][X-SB] pc=0x00000000f0 slot=0 preg=29 scoreboard hit data=0x0000000000000002
-[C910][X-WB] pc=0x00000000f0 rd=x7 preg=29 data=0x0000000000000002
-[DBG][F-WARN] pc=0x00000000f0 slot=0 no PST entry matched, skipping
+[C910][X-WB] pc=0x00000000f0 rd=x28 preg=35 data=0x0000000000005000
 [COMMIT] PC: 0x00000000f2
+[C910][X-WB] pc=0x00000000f2 rd=x28 preg=94 data=0x00000000000055aa
 [COMMIT] PC: 0x00000000f6
 [COMMIT] PC: 0x00000000fa
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0xfffffffffdeadbef
-[DBG][X-WARN] pc=0x00000000f2 slot=0 no PST entry matched, skipping
-[DBG][X-SB] pc=0x00000000f6 slot=1 preg=18 scoreboard hit data=0xfffffffffdeae000
-[C910][X-WB] pc=0x00000000f6 rd=x10 preg=18 data=0xfffffffffdeae000
-[DBG][X-SB] pc=0x00000000fa slot=2 preg=9 scoreboard=0xfffffffffdeadbef PRF=0x0000000000000001 (scoreboard wins)
-[C910][X-WB] pc=0x00000000fa rd=x10 preg=9 data=0xfffffffffdeadbef
-[DBG][F-WARN] pc=0x00000000f2 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000000f6 slot=1 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x00000000fa slot=2 no PST entry matched, skipping
+[C910][X-WB] pc=0x00000000fa rd=x28 preg=19 data=0x000000000000007d
 [COMMIT] PC: 0x00000000fe
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0xffffffdeadbef000
-[DBG][X-SB] pc=0x00000000fe slot=0 preg=94 scoreboard=0xffffffdeadbef000 PRF=0x0000000000000002 (scoreboard wins)
-[C910][X-WB] pc=0x00000000fe rd=x10 preg=94 data=0xffffffdeadbef000
-[DBG][F-WARN] pc=0x00000000fe slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000100
-[DBG][X-SB] src=iu_pipe0 preg=33 data=0xffffffdeadbeefcb
-[DBG][X-SB] pc=0x0000000100 slot=0 preg=33 scoreboard=0xffffffdeadbeefcb PRF=0x0000000000003fff (scoreboard wins)
-[C910][X-WB] pc=0x0000000100 rd=x10 preg=33 data=0xffffffdeadbeefcb
-[DBG][F-WARN] pc=0x0000000100 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000104
-[DBG][X-SB] src=iu_pipe1 preg=92 data=0xfffdeadbeefcb000
-[DBG][X-SB] pc=0x0000000104 slot=0 preg=92 scoreboard=0xfffdeadbeefcb000 PRF=0x0000000000000000 (scoreboard wins)
-[C910][X-WB] pc=0x0000000104 rd=x10 preg=92 data=0xfffdeadbeefcb000
-[DBG][F-WARN] pc=0x0000000104 slot=0 no PST entry matched, skipping
+[COMMIT] PC: 0x0000000102
 [COMMIT] PC: 0x0000000106
-[DBG][X-SB] src=iu_pipe0 preg=30 data=0xfffdeadbeefcafef
-[DBG][X-SB] pc=0x0000000106 slot=0 preg=30 scoreboard=0xfffdeadbeefcafef PRF=0x0000000000000002 (scoreboard wins)
-[C910][X-WB] pc=0x0000000106 rd=x10 preg=30 data=0xfffdeadbeefcafef
-[DBG][F-WARN] pc=0x0000000106 slot=0 no PST entry matched, skipping
+[C910][X-WB] pc=0x0000000102 rd=x28 preg=93 data=0x00000000000003ff
+[C910][X-WB] pc=0x0000000106 rd=x28 preg=32 data=0x3ff0000000000000
 [COMMIT] PC: 0x0000000108
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0xdeadbeefcafef000
-[DBG][X-SB] pc=0x0000000108 slot=0 preg=9 scoreboard=0xdeadbeefcafef000 PRF=0xfffffffffdeadbef (scoreboard wins)
-[C910][X-WB] pc=0x0000000108 rd=x10 preg=9 data=0xdeadbeefcafef000
-[DBG][F-WARN] pc=0x0000000108 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x000000010a
-[DBG][X-SB] src=iu_pipe1 preg=90 data=0xdeadbeefcafef00d
-[DBG][X-SB] pc=0x000000010a slot=0 preg=90 scoreboard=0xdeadbeefcafef00d PRF=0x0000000000000001 (scoreboard wins)
-[C910][X-WB] pc=0x000000010a rd=x10 preg=90 data=0xdeadbeefcafef00d
-[DBG][F-WARN] pc=0x000000010a slot=0 no PST entry matched, skipping
 [COMMIT] PC: 0x000000010c
-[DBG][X-WARN] pc=0x000000010c slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000010c slot=0 no PST entry matched, skipping
+[C910][F-WB] pc=0x0000000108 rd=f0 vreg=32 data=0x3ff0000000000000
+[C910][F-WB] pc=0x000000010c rd=f1 vreg=63 data=0x4000000000000000
 [COMMIT] PC: 0x0000000110
-[DBG][X-SB] src=iu_pipe0 preg=15 data=0x000000000000007f
-[DBG][X-SB] src=iu_pipe1 preg=10 data=0x00000000000001d0
-[DBG][X-SB] pc=0x0000000110 slot=0 preg=15 scoreboard=0x000000000000007f PRF=0x0000000000000002 (scoreboard wins)
-[C910][X-WB] pc=0x0000000110 rd=x11 preg=15 data=0x000000000000007f
-[DBG][F-WARN] pc=0x0000000110 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe0 preg=9 data=0x0000000000000200
-[COMMIT] PC: 0x0000000114
+[C910][X-WB] pc=0x0000000110 rd=x28 preg=29 data=0x0000000000001000
+[COMMIT] PC: 0x0000000112
+[C910][X-WB] pc=0x0000000112 rd=x28 preg=94 data=0x0000000000000801
+[COMMIT] PC: 0x0000000116
+[C910][X-WB] pc=0x0000000116 rd=x28 preg=31 data=0x4008000000000000
 [COMMIT] PC: 0x0000000118
 [COMMIT] PC: 0x000000011c
-[DBG][X-WARN] pc=0x0000000114 slot=0 no PST entry matched, skipping
-[DBG][X-SB] pc=0x0000000118 slot=1 preg=10 scoreboard hit data=0x00000000000001d0
-[C910][X-WB] pc=0x0000000118 rd=x30 preg=10 data=0x00000000000001d0
-[DBG][X-SB] pc=0x000000011c slot=2 preg=9 scoreboard hit data=0x0000000000000200
-[C910][X-WB] pc=0x000000011c rd=x30 preg=9 data=0x0000000000000200
-[DBG][F-WARN] pc=0x0000000114 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000118 slot=1 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000011c slot=2 no PST entry matched, skipping
+[C910][F-WB] pc=0x0000000118 rd=f2 vreg=34 data=0x4008000000000000
+[C910][F-WB] pc=0x000000011c rd=f3 vreg=61 data=0x4018000000000000
 [COMMIT] PC: 0x0000000120
-[DBG][X-SB] src=iu_pipe0 preg=30 data=0x0000000000000010
-[DBG][X-SB] src=iu_pipe1 preg=18 data=0x0000000000000005
-[DBG][X-SB] pc=0x0000000120 slot=0 preg=30 scoreboard=0x0000000000000010 PRF=0xfffdeadbeefcafef (scoreboard wins)
-[C910][X-WB] pc=0x0000000120 rd=x31 preg=30 data=0x0000000000000010
-[DBG][F-WARN] pc=0x0000000120 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000122
-[COMMIT] PC: 0x0000000126
-[DBG][X-SB] src=iu_pipe0 preg=11 data=0x0000000000247000
-[DBG][X-WARN] pc=0x0000000122 slot=0 no PST entry matched, skipping
-[DBG][X-SB] pc=0x0000000126 slot=1 preg=18 scoreboard hit data=0x0000000000000005
-[C910][X-WB] pc=0x0000000126 rd=x7 preg=18 data=0x0000000000000005
-[DBG][F-WARN] pc=0x0000000122 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000126 slot=1 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe0 preg=33 data=0x00000000002468ad
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x000000091a2b4000
-[DBG][X-SB] src=iu_pipe0 preg=10 data=0x000000091a2b3c4d
-[DBG][X-SB] src=iu_pipe0 preg=29 data=0x000091a2b3c4d000
-[DBG][X-SB] src=iu_pipe1 preg=92 data=0x000091a2b3c4d5e7
-[DBG][X-SB] src=iu_pipe0 preg=35 data=0x123456789abce000
-[DBG][X-SB] src=iu_pipe1 preg=88 data=0x123456789abcdef0
-[DBG][X-SB] src=iu_pipe0 preg=87 data=0x123456789abcdef0
-[DBG][X-SB] src=iu_pipe1 preg=37 data=0x0000000000000208
-[DBG][X-SB] src=iu_pipe1 preg=86 data=0x0000000000000007
+[COMMIT] PC: 0x0000000124
 [COMMIT] PC: 0x0000000128
-[DBG][X-WARN] pc=0x0000000128 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000128 slot=0 no PST entry matched, skipping
-[DBG][X-SB] src=lsu_pipe3 preg=6 data=0x0000000000000010
-[DBG][X-SB] src=iu_pipe0 preg=85 data=0x0000000000000003
-[COMMIT] PC: 0x0000000128
-[DBG][X-SB] src=iu_pipe0 preg=89 data=0x0000000000000015
-[DBG][X-WARN] pc=0x0000000128 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000128 slot=0 no PST entry matched, skipping
-[COMMIT] PC: 0x0000000128
-[COMMIT] PC: 0x000000012c
-[COMMIT] PC: 0x0000000130
-[DBG][X-SB] pc=0x0000000128 slot=0 preg=6 scoreboard hit data=0x0000000000000010
-[ERROR][X-WB] pc=0x0000000128 slot=0 MULTIPLE PST matches (2 entries), bitmap=0x020000000000000000000040, using first=6
-[C910][X-WB] pc=0x0000000128 rd=x28 preg=6 data=0x0000000000000010
-[DBG][X-SB] pc=0x000000012c slot=1 preg=11 scoreboard hit data=0x0000000000247000
-[C910][X-WB] pc=0x000000012c rd=x31 preg=11 data=0x0000000000247000
-[DBG][X-SB] pc=0x0000000130 slot=2 preg=33 scoreboard hit data=0x00000000002468ad
-[C910][X-WB] pc=0x0000000130 rd=x31 preg=33 data=0x00000000002468ad
-[DBG][F-WARN] pc=0x0000000128 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000012c slot=1 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000130 slot=2 no PST entry matched, skipping
+[C910][X-WB] pc=0x0000000128 rd=x8 preg=28 data=0x0000000000000000
+[COMMIT] PC: 0x000000012a (EXCEPTION)
+[COMMIT] PC: 0x00000001c4
+[C910][X-WB] pc=0x00000001c4 rd=x5 preg=15 data=0x000000000000012a
+[COMMIT] PC: 0x00000001c8
+[C910][X-WB] pc=0x00000001c8 rd=x6 preg=9 data=0x0000000000000002
+[COMMIT] PC: 0x00000001cc
+[C910][X-WB] pc=0x00000001cc rd=x29 preg=6 data=0x0000000000000000
+[COMMIT] PC: 0x00000001d0
+[C910][X-WB] pc=0x00000001d0 rd=x30 preg=18 data=0x0000000000000004
+[COMMIT] PC: 0x00000001d4
+[COMMIT] PC: 0x00000001d8
+[C910][X-WB] pc=0x00000001d4 rd=x6 preg=94 data=0x0000000000000002
+[C910][X-WB] pc=0x00000001d8 rd=x7 preg=19 data=0x0000000000000002
+[COMMIT] PC: 0x00000001da
+[C910][X-WB] pc=0x00000001da rd=x28 preg=32 data=0x0000000000000002
+[COMMIT] PC: 0x00000001dc
+[COMMIT] PC: 0x00000001f0
+[COMMIT] PC: 0x00000001f4
+[C910][X-WB] pc=0x00000001f0 rd=x29 preg=7 data=0x0000000000000000
+[C910][X-WB] pc=0x00000001f4 rd=x28 preg=93 data=0x0000000000000003
+[COMMIT] PC: 0x00000001f6
+[COMMIT] PC: 0x00000001fe
+[C910][X-WB] pc=0x00000001fe rd=x7 preg=6 data=0x0000000000000002
+[COMMIT] PC: 0x0000000200
+[C910][X-WB] pc=0x0000000200 rd=x5 preg=29 data=0x000000000000012c
+[COMMIT] PC: 0x0000000202
+[COMMIT] PC: 0x0000000206
+[COMMIT] PC: 0x000000020a
+[COMMIT] PC: 0x000000020e
+[COMMIT] PC: 0x000000012c (EXCEPTION)
+[COMMIT] PC: 0x00000001c4
+[C910][X-WB] pc=0x00000001c4 rd=x5 preg=9 data=0x000000000000012c
+[COMMIT] PC: 0x00000001c8
+[C910][X-WB] pc=0x00000001c8 rd=x6 preg=15 data=0x0000000000000002
+[COMMIT] PC: 0x00000001cc
+[C910][X-WB] pc=0x00000001cc rd=x29 preg=16 data=0x0000000000000000
+[COMMIT] PC: 0x00000001d0
+[C910][X-WB] pc=0x00000001d0 rd=x30 preg=7 data=0x0000000000000004
+[COMMIT] PC: 0x00000001d4
+[COMMIT] PC: 0x00000001d8
+[C910][X-WB] pc=0x00000001d4 rd=x6 preg=94 data=0x0000000000000002
+[C910][X-WB] pc=0x00000001d8 rd=x7 preg=19 data=0x0000000000000002
+[COMMIT] PC: 0x00000001da
+[C910][X-WB] pc=0x00000001da rd=x28 preg=31 data=0x0000000000000002
+[COMMIT] PC: 0x00000001dc
+[COMMIT] PC: 0x00000001f0
+[COMMIT] PC: 0x00000001f4
+[C910][X-WB] pc=0x00000001f0 rd=x29 preg=6 data=0x0000000000000000
+[C910][X-WB] pc=0x00000001f4 rd=x28 preg=93 data=0x0000000000000003
+[COMMIT] PC: 0x00000001f6
+[COMMIT] PC: 0x00000001fe
+[C910][X-WB] pc=0x00000001fe rd=x7 preg=15 data=0x0000000000000002
+[COMMIT] PC: 0x0000000200
+[C910][X-WB] pc=0x0000000200 rd=x5 preg=29 data=0x000000000000012e
+[COMMIT] PC: 0x0000000202
+[COMMIT] PC: 0x0000000206
+[COMMIT] PC: 0x000000020a
+[COMMIT] PC: 0x000000020e
+[COMMIT] PC: 0x000000012e
+[C910][X-WB] pc=0x000000012e rd=x8 preg=9 data=0x0000000000000001
+[COMMIT] PC: 0x0000000130 (EXCEPTION)
+[COMMIT] PC: 0x00000001c4
+[C910][X-WB] pc=0x00000001c4 rd=x5 preg=16 data=0x0000000000000130
+[COMMIT] PC: 0x00000001c8
+[C910][X-WB] pc=0x00000001c8 rd=x6 preg=18 data=0x0000000000000002
+[COMMIT] PC: 0x00000001cc
+[C910][X-WB] pc=0x00000001cc rd=x29 preg=19 data=0x0000000000000000
+[COMMIT] PC: 0x00000001d0
+[C910][X-WB] pc=0x00000001d0 rd=x30 preg=6 data=0x0000000000000004
+[COMMIT] PC: 0x00000001d4
+[COMMIT] PC: 0x00000001d8
+[C910][X-WB] pc=0x00000001d4 rd=x6 preg=94 data=0x0000000000000002
+[C910][X-WB] pc=0x00000001d8 rd=x7 preg=28 data=0x0000000000000002
+[COMMIT] PC: 0x00000001da
+[C910][X-WB] pc=0x00000001da rd=x28 preg=31 data=0x0000000000000002
+[COMMIT] PC: 0x00000001dc
+[COMMIT] PC: 0x00000001f0
+[COMMIT] PC: 0x00000001f4
+[C910][X-WB] pc=0x00000001f0 rd=x29 preg=7 data=0x0000000000000000
+[C910][X-WB] pc=0x00000001f4 rd=x28 preg=93 data=0x0000000000000003
+[COMMIT] PC: 0x00000001f6
+[COMMIT] PC: 0x00000001fe
+[C910][X-WB] pc=0x00000001fe rd=x7 preg=15 data=0x0000000000000002
+[COMMIT] PC: 0x0000000200
+[C910][X-WB] pc=0x0000000200 rd=x5 preg=29 data=0x0000000000000132
+[COMMIT] PC: 0x0000000202
+[COMMIT] PC: 0x0000000206
+[COMMIT] PC: 0x000000020a
+[COMMIT] PC: 0x000000020e
+[COMMIT] PC: 0x0000000132
 [COMMIT] PC: 0x0000000134
+[C910][X-WB] pc=0x0000000132 rd=x8 preg=16 data=0x0000000000000002
+[C910][X-WB] pc=0x0000000134 rd=x7 preg=92 data=0x0000000000000002
 [COMMIT] PC: 0x0000000136
 [COMMIT] PC: 0x000000013a
-[DBG][X-SB] pc=0x0000000134 slot=0 preg=94 scoreboard hit data=0x000000091a2b4000
-[C910][X-WB] pc=0x0000000134 rd=x31 preg=94 data=0x000000091a2b4000
-[DBG][X-SB] pc=0x0000000136 slot=1 preg=10 scoreboard hit data=0x000000091a2b3c4d
-[C910][X-WB] pc=0x0000000136 rd=x31 preg=10 data=0x000000091a2b3c4d
-[DBG][X-SB] pc=0x000000013a slot=2 preg=29 scoreboard hit data=0x000091a2b3c4d000
-[C910][X-WB] pc=0x000000013a rd=x31 preg=29 data=0x000091a2b3c4d000
-[DBG][F-WARN] pc=0x0000000134 slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000136 slot=1 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x000000013a slot=2 no PST entry matched, skipping
-[COMMIT] PC: 0x000000013c
-[COMMIT] PC: 0x0000000140
+[C910][X-WB] pc=0x000000013a rd=x10 preg=28 data=0xfffffffffdeae000
+[COMMIT] PC: 0x000000013e
+[C910][X-WB] pc=0x000000013e rd=x10 preg=31 data=0xfffffffffdeadbef
 [COMMIT] PC: 0x0000000142
-[DBG][X-SB] pc=0x000000013c slot=0 preg=92 scoreboard hit data=0x000091a2b3c4d5e7
-[C910][X-WB] pc=0x000000013c rd=x31 preg=92 data=0x000091a2b3c4d5e7
-[DBG][X-SB] pc=0x0000000140 slot=1 preg=35 scoreboard hit data=0x123456789abce000
-[C910][X-WB] pc=0x0000000140 rd=x31 preg=35 data=0x123456789abce000
-[DBG][X-SB] pc=0x0000000142 slot=2 preg=88 scoreboard hit data=0x123456789abcdef0
-[C910][X-WB] pc=0x0000000142 rd=x31 preg=88 data=0x123456789abcdef0
-[DBG][F-WARN] pc=0x000000013c slot=0 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000140 slot=1 no PST entry matched, skipping
-[DBG][F-WARN] pc=0x0000000142 slot=2 no PST entry matched, skipping
-[DBG][X-SB] src=iu_pipe1 preg=83 data=0x0000000000444000
-[DBG][X-SB] src=iu_pipe0 preg=39 data=0x0000000001fff000
-[DBG][X-SB] src=iu_pipe0 preg=31 data=0x0000000000444333
-[DBG][X-SB] src=iu_pipe0 preg=10 data=0x0000000444333000
-[DBG][X-SB] src=iu_pipe1 preg=94 data=0x0000000444333222
+[C910][X-WB] pc=0x0000000142 rd=x10 preg=90 data=0xffffffdeadbef000
+[COMMIT] PC: 0x0000000144
+[C910][X-WB] pc=0x0000000144 rd=x10 preg=18 data=0xffffffdeadbeefcb
+[COMMIT] PC: 0x0000000148
+[C910][X-WB] pc=0x0000000148 rd=x10 preg=9 data=0xfffdeadbeefcb000
+[COMMIT] PC: 0x000000014a
+[C910][X-WB] pc=0x000000014a rd=x10 preg=89 data=0xfffdeadbeefcafef
+[COMMIT] PC: 0x000000014c
+[C910][X-WB] pc=0x000000014c rd=x10 preg=10 data=0xdeadbeefcafef000
+[COMMIT] PC: 0x000000014e
+[C910][X-WB] pc=0x000000014e rd=x10 preg=15 data=0xdeadbeefcafef00d
+[COMMIT] PC: 0x0000000150
+[COMMIT] PC: 0x0000000154
+[C910][X-WB] pc=0x0000000154 rd=x11 preg=88 data=0x000000000000007f
+[COMMIT] PC: 0x0000000158
+[COMMIT] PC: 0x000000015c
+[C910][X-WB] pc=0x000000015c rd=x30 preg=33 data=0x0000000000000218
+[COMMIT] PC: 0x0000000160
+[COMMIT] PC: 0x0000000164
+[C910][X-WB] pc=0x0000000160 rd=x30 preg=9 data=0x0000000000000248
+[C910][X-WB] pc=0x0000000164 rd=x31 preg=90 data=0x0000000000000010
+[COMMIT] PC: 0x0000000166
+[COMMIT] PC: 0x000000016a
+[C910][X-WB] pc=0x000000016a rd=x7 preg=6 data=0x0000000000000005
+[C910][M-WB] pc=0x00000000aa addr=0x0000000218 data=0x3333333333333333 strb=0xff00
+[C910][M-WB] pc=0x00000000ae addr=0x0000000220 data=0x0000000000002222 strb=0xff00
+[C910][M-WB] pc=0x00000000b2 addr=0x0000000222 data=0x0000000000110000 strb=0x07fc
+[C910][M-WB] pc=0x00000000b6 addr=0x0000000224 data=0x3333333300000000 strb=0xfff7
+[C910][M-WB] pc=0x00000000d8 addr=0x0000000258 data=0x0123456789abcdef strb=0x007f
+[C910][M-WB] pc=0x00000000e8 addr=0x0000000260 data=0x00000000feedface strb=0x00ff
+[C910][M-WB] pc=0x00000000f2 addr=0x0000000264 data=0x000055aa00000000 strb=0xff00
+[COMMIT] PC: 0x000000016c
+[COMMIT] PC: 0x000000016c
+[COMMIT] PC: 0x000000016c
+[COMMIT] PC: 0x0000000170
+[COMMIT] PC: 0x0000000174
+[ERROR][X-WB] pc=0x000000016c slot=0 MULTIPLE PST matches (2 entries), bitmap=0x020000000000000000000400, using first=10
+[C910][X-WB] pc=0x000000016c rd=x28 preg=10 data=0x0000000000000010
+[C910][X-WB] pc=0x0000000170 rd=x31 preg=11 data=0x0000000000247000
+[C910][X-WB] pc=0x0000000174 rd=x31 preg=87 data=0x00000000002468ad
+[COMMIT] PC: 0x0000000178
+[COMMIT] PC: 0x000000017a
+[COMMIT] PC: 0x000000017e
+[C910][X-WB] pc=0x0000000178 rd=x31 preg=32 data=0x000000091a2b4000
+[C910][X-WB] pc=0x000000017a rd=x31 preg=18 data=0x000000091a2b3c4d
+[C910][X-WB] pc=0x000000017e rd=x31 preg=92 data=0x000091a2b3c4d000
+[COMMIT] PC: 0x0000000180
+[COMMIT] PC: 0x0000000184
+[COMMIT] PC: 0x0000000186
+[C910][X-WB] pc=0x0000000180 rd=x31 preg=30 data=0x000091a2b3c4d5e7
+[C910][X-WB] pc=0x0000000184 rd=x31 preg=86 data=0x123456789abce000
+[C910][X-WB] pc=0x0000000186 rd=x31 preg=28 data=0x123456789abcdef0
 **********************************************
 *    simulation finished successfully        *
 **********************************************
 *** X-WB Logging Statistics ***
-  Total X-WB logs:        111
+  Total X-WB logs:        127
   Note: preg0 has no PST entry and cannot be tracked
-  No PST match:           39
+  No PST match:           43
   Multiple PST matches:   1
   No WB bus hit (PRF):    0 (0.0%)
-- ../logical/tb/tb_verilator.v:372: Verilog $finish
+- ../logical/tb/tb_verilator.v:438: Verilog $finish

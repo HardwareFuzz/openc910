@@ -15,6 +15,8 @@ DISABLE_ALL_FUSION="${DISABLE_ALL_FUSION:-1}"
 REG_WRITE_LOG="${REG_WRITE_LOG:-1}"
 # Set REG_WRITE_DBG=1 to enable temporary DBG prints (guarded by C910_DBG_XWB), default off
 REG_WRITE_DBG="${REG_WRITE_DBG:-0}"
+# Set BOOT_DEBUG_LOG=1 to enable very verbose boot/loader logs (guarded by C910_DEBUG_BOOT)
+BOOT_DEBUG_LOG="${BOOT_DEBUG_LOG:-0}"
 
 # Build SIM_OPT based on flags
 SIM_OPT_BASE="-x-assign 0 -Wno-fatal --threads ${THREADS} --verilate-jobs ${THREADS} -j ${THREADS} -Wno-TIMESCALEMOD --timing"
@@ -31,6 +33,9 @@ fi
 if [ "$REG_WRITE_DBG" = "1" ]; then
   SIM_OPT_BASE="-DC910_DBG_XWB ${SIM_OPT_BASE}"
 fi
+if [ "$BOOT_DEBUG_LOG" = "1" ]; then
+  SIM_OPT_BASE="-DC910_DEBUG_BOOT ${SIM_OPT_BASE}"
+fi
 SIM_OPT="${SIM_OPT:-${SIM_OPT_BASE}}"
 
 CODE_BASE_PATH="${CODE_BASE_PATH:-$(cd "${ROOT_DIR}/C910_RTL_FACTORY" && pwd)}"
@@ -46,6 +51,7 @@ echo "[build] THREADS=${THREADS} (detected ${NPROC_CORES} cores)"
 echo "[build] SIM_OPT=${SIM_OPT}"
 echo "[build] REG_WRITE_LOG=${REG_WRITE_LOG} (adds -DC910_LOGGER)"
 echo "[build] REG_WRITE_DBG=${REG_WRITE_DBG} (adds -DC910_DBG_XWB)"
+echo "[build] BOOT_DEBUG_LOG=${BOOT_DEBUG_LOG} (adds -DC910_DEBUG_BOOT)"
 
 mkdir -p "${BUILD_DIR}"
 mkdir -p "${ROOT_DIR}/smart_run/work"

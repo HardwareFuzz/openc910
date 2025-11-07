@@ -42,11 +42,17 @@ std::string quote(const fs::path& path) {
 }
 
 bool runCommand(const std::string& cmd) {
+#ifdef C910_DEBUG_BOOT
+    std::cerr << "[sim_main1][BOOT] running: " << cmd << std::endl;
+#endif
     int ret = std::system(cmd.c_str());
     if (ret != 0) {
         std::cerr << "[sim_main1] Command failed (" << ret << "): " << cmd << std::endl;
         return false;
     }
+#ifdef C910_DEBUG_BOOT
+    std::cerr << "[sim_main1][BOOT] ok: " << cmd << std::endl;
+#endif
     return true;
 }
 
@@ -94,6 +100,9 @@ int main(int argc, char** argv, char** env) {
     std::string elfPath;
     bool keepTemp = getEnvVar("KEEP_C910_TEMP") == "1";
 
+#ifdef C910_DEBUG_BOOT
+    std::cerr << "[sim_main1][BOOT] argc=" << argc << std::endl;
+#endif
     for (int i = 1; i < argc; ++i) {
         std::string arg(argv[i]);
         if (arg == "--elf" && (i + 1) < argc) {
@@ -111,6 +120,9 @@ int main(int argc, char** argv, char** env) {
     tempDir.keep = keepTemp;
 
     if (!elfPath.empty()) {
+#ifdef C910_DEBUG_BOOT
+        std::cerr << "[sim_main1][BOOT] KEEP_C910_TEMP=" << (keepTemp ? "1" : "0") << std::endl;
+#endif
         try {
             tempDir.path = makeTempDir("c910_");
         } catch (const std::exception& e) {
@@ -118,6 +130,9 @@ int main(int argc, char** argv, char** env) {
             return 1;
         }
 
+#ifdef C910_DEBUG_BOOT
+        std::cerr << "[sim_main1][BOOT] temp dir: " << tempDir.path << std::endl;
+#endif
         fs::path elf = fs::absolute(elfPath);
         fs::path instHex = tempDir.path / "inst.hex";
         fs::path dataHex = tempDir.path / "data.hex";
@@ -137,6 +152,17 @@ int main(int argc, char** argv, char** env) {
             return 1;
         }
 
+#ifdef C910_DEBUG_BOOT
+        std::cerr << "[sim_main1][BOOT] elf: " << elf << std::endl;
+        std::cerr << "[sim_main1][BOOT] objcopy: " << objcopyPath << std::endl;
+        std::cerr << "[sim_main1][BOOT] Srec2vmem: " << srec2vmemPath << std::endl;
+        std::cerr << "[sim_main1][BOOT] outputs:\n"
+                  << "  instHex=" << instHex << "\n"
+                  << "  dataHex=" << dataHex << "\n"
+                  << "  fileHex=" << fileHex << "\n"
+                  << "  instPat=" << instPat << "\n"
+                  << "  dataPat=" << dataPat << std::endl;
+#endif
         std::ostringstream cmd;
         cmd << quote(objcopyPath) << " -O srec " << quote(elf) << " " << quote(instHex)
             << " -j .text* -j .rodata* -j .eh_frame*";
@@ -172,6 +198,9 @@ int main(int argc, char** argv, char** env) {
 
         forwardedArgs.emplace_back("+INST=" + instPat.string());
         forwardedArgs.emplace_back("+DATA=" + dataPat.string());
+#ifdef C910_DEBUG_BOOT
+        std::cerr << "[sim_main1][BOOT] plusargs: +INST=" << instPat << " +DATA=" << dataPat << std::endl;
+#endif
     }
 
     std::vector<char*> forwardedArgv;
@@ -209,6 +238,9 @@ int main(int argc, char** argv, char** env) {
     // "TOP" will be the hierarchical name of the module.
     const std::unique_ptr<Vtop> top{new Vtop{contextp.get(), "TOP"}};
 
+#ifdef C910_DEBUG_BOOT
+    std::cerr << "[sim_main1][BOOT] Vtop constructed, starting main loop..." << std::endl;
+#endif
     // Set Vtop's input signals
     top->clk = 0;
 
@@ -255,8 +287,20 @@ int main(int argc, char** argv, char** env) {
         //          " -> oquad=%" VL_PRI64 "x owide=%x_%08x_%08x\n",
         //          contextp->time(), top->clk, top->reset_l, top->in_quad, top->out_quad,
         //          top->out_wide[2], top->out_wide[1], top->out_wide[0]);
+#ifdef C910_DEBUG_BOOT
+        // Heartbeat from C++ every ~1e6 time units
+        static vluint64_t last_print_t = 0;
+        vluint64_t now_t = contextp->time();
+        if (VL_UNLIKELY(now_t - last_print_t >= 1000000)) {
+            last_print_t = now_t;
+            std::cerr << "[sim_main1][BOOT] t=" << now_t << std::endl;
+        }
+#endif
     }
 
+#ifdef C910_DEBUG_BOOT
+    std::cerr << "[sim_main1][BOOT] main loop finished, calling final()" << std::endl;
+#endif
     // Final model cleanup
     top->final();
 

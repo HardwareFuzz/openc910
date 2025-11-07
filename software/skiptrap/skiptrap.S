@@ -11,6 +11,10 @@
 buf:
     .space 64
 
+.align 3
+extra_buf:
+    .space 32
+
 .section .text
 .globl __start
 
@@ -57,6 +61,17 @@ regw_test:
     sh      s2, 8(t0)              /* store 2B */
     sb      s1, 10(t0)             /* store 1B */
     sw      s3, 12(t0)             /* store 4B */
+
+    /* Additional fixed memory writes for logger coverage */
+    la      t4, extra_buf
+    li      t5, 0x0123456789abcdef
+    sd      t5, 0(t4)
+    li      t6, 0xfeedface
+    sw      t6, 8(t4)
+    li      t3, 0x55aa
+    sh      t3, 12(t4)
+    li      t3, 0x7d
+    sb      t3, 14(t4)
 
     /* ---------------- Floating-point writes + stores -------------- */
     /* f0 = 1.0, f1 = 2.0, f2 = 3.0, f3 = f1*f2 = 6.0 */
