@@ -243,6 +243,16 @@ module tb();
   reg [63:0] value0;
   reg [63:0] value1;
   reg [63:0] value2;
+  reg        cx_success_seen;
+  reg        cx_fail_seen;
+  reg [7:0]  cx_finish_countdown;
+
+  initial
+  begin
+    cx_success_seen = 1'b0;
+    cx_fail_seen = 1'b0;
+    cx_finish_countdown = 8'b0;
+  end
 
 `ifdef CX_TRACE
   integer cx_trace_file;
@@ -392,8 +402,6 @@ module tb();
 `endif
 
 
-  
-  
   always @(posedge clk)
   begin
     cpu_awlen[3:0]   <= `SOC_TOP.x_axi_slave128.awlen[3:0];
@@ -410,29 +418,37 @@ module tb();
   
   always @(posedge clk)
   begin
-      if(value0 == 64'h444333222 || value1 == 64'h444333222 || value2 == 64'h444333222)
+      if(!cx_success_seen && !cx_fail_seen && (cpu_awlen[3:0] == 4'b0) && (cpu_awaddr[31:0] == 32'h0004_0000) && cpu_wvalid && `clk_en)
     begin
-      $display("**********************************************");
-      $display("*    simulation finished successfully        *");
-      $display("**********************************************");
-     #10;
-     FILE = $fopen("run_case.report","w");
-     $fwrite(FILE,"TEST PASS");   
-  
-     $finish;
+      cx_success_seen <= 1'b1;
+      cx_finish_countdown <= 8'd32;
     end
-      else if (value0 == 64'h2382348720 || value1 == 64'h2382348720 || value2 == 64'h444333222)
+      else if(cx_finish_countdown != 8'b0)
     begin
-     $display("**********************************************");
-     $display("*    simulation finished with error          *");
-     $display("**********************************************");
-     #10;
-     FILE = $fopen("run_case.report","w");
-     $fwrite(FILE,"TEST FAIL");   
-  
-     $finish;
+      cx_finish_countdown <= cx_finish_countdown - 1'b1;
+      if(cx_finish_countdown == 8'd1)
+      begin
+        if(cx_success_seen)
+        begin
+          $display("**********************************************");
+          $display("*    simulation finished successfully        *");
+          $display("**********************************************");
+          FILE = $fopen("run_case.report","w");
+          $fwrite(FILE,"TEST PASS");
+        end
+        else
+        begin
+          $display("**********************************************");
+          $display("*    simulation finished with error          *");
+          $display("**********************************************");
+          FILE = $fopen("run_case.report","w");
+          $fwrite(FILE,"TEST FAIL");
+        end
+        #10;
+        $finish;
+      end
     end
-  
+
     else if((cpu_awlen[3:0] == 4'b0) &&
   //     (cpu_awaddr[31:0] == 32'h6000fff8) &&
   //     (cpu_awaddr[31:0] == 32'h0003fff8) &&
