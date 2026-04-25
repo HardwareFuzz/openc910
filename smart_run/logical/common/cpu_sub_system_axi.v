@@ -193,6 +193,17 @@ wire       [1 : 0]     core0_pad_lpmd_b                         ;
 wire                   had_pad_jtg_tdo                             ;
 wire                   had_pad_jtg_tdo_en                          ;
 
+// Core 1 retire / status signals exposed for testbench observation
+wire                   core1_pad_retire0                        ;
+wire       [39 : 0]    core1_pad_retire0_pc                     ;
+wire                   core1_pad_retire1                        ;
+wire       [39 : 0]    core1_pad_retire1_pc                     ;
+wire                   core1_pad_retire2                        ;
+wire       [39 : 0]    core1_pad_retire2_pc                     ;
+wire       [1 : 0]     core1_pad_lpmd_b                         ;
+wire       [1 : 0]     core1_pad_jdb_pm                         ;
+wire       [63 : 0]    core1_pad_mstatus                        ;
+
 //----------------------------------------------------------------------
 wire     [7  : 0]     biu_pad_wid;            
 wire     [63 : 0]     xx_intc_int;            
@@ -324,18 +335,18 @@ rv_integration_platform  x_rv_integration_platform (
      //----- Core 1 -----
     .pad_core1_dbg_mask                           (1'b0                                     ),
     .pad_core1_dbgrq_b                            (1'b1                                     ),
-    .pad_core1_rst_b                              (1'b0                                     ),
+    .pad_core1_rst_b                              (pad_cpu_rst_b                            ),
     .pad_core1_hartid                             (3'h1                                     ),
     .pad_core1_rvba                               (40'h0                                    ),
-    .core1_pad_jdb_pm                             (                                         ),
-    .core1_pad_lpmd_b                             (                                         ),
-    .core1_pad_mstatus                            (                                         ),
-    .core1_pad_retire0                            (                                         ),
-    .core1_pad_retire0_pc                         (                                         ),
-    .core1_pad_retire1                            (                                         ),
-    .core1_pad_retire1_pc                         (                                         ),
-    .core1_pad_retire2                            (                                         ),
-    .core1_pad_retire2_pc                         (                                         ),
+    .core1_pad_jdb_pm                             (core1_pad_jdb_pm                         ),
+    .core1_pad_lpmd_b                             (core1_pad_lpmd_b                         ),
+    .core1_pad_mstatus                            (core1_pad_mstatus                        ),
+    .core1_pad_retire0                            (core1_pad_retire0                        ),
+    .core1_pad_retire0_pc                         (core1_pad_retire0_pc                     ),
+    .core1_pad_retire1                            (core1_pad_retire1                        ),
+    .core1_pad_retire1_pc                         (core1_pad_retire1_pc                     ),
+    .core1_pad_retire2                            (core1_pad_retire2                        ),
+    .core1_pad_retire2_pc                         (core1_pad_retire2_pc                     ),
 
 
 
