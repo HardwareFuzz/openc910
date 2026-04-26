@@ -285,8 +285,150 @@ module top(
   reg [63:0] value0;
   reg [63:0] value1;
   reg [63:0] value2;
-  
-  
+  reg        cx_success_seen;
+  reg        cx_fail_seen;
+  reg [7:0]  cx_finish_countdown;
+
+  initial
+  begin
+    cx_success_seen = 1'b0;
+    cx_fail_seen = 1'b0;
+    cx_finish_countdown = 8'b0;
+  end
+
+`ifdef CX_TRACE
+  integer cx_trace_file;
+  reg [4095:0] cx_trace_path;
+
+  initial
+  begin
+    if(!$value$plusargs("cx_trace=%s", cx_trace_path)) begin
+      cx_trace_path = "openc910_trace_hart_00000000.log";
+    end
+    cx_trace_file = $fopen(cx_trace_path, "w");
+  end
+
+  always @(posedge clk)
+  begin
+    if(cx_trace_file != 0) begin
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_preg_vld) begin
+        $fwrite(cx_trace_file, "dispatch cycle=%0d hart=0 iid=%0d rd=x%0d preg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_preg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_dst_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_preg[6:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_preg_vld) begin
+        $fwrite(cx_trace_file, "dispatch cycle=%0d hart=0 iid=%0d rd=x%0d preg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_preg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_dst_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_preg[6:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_preg_vld) begin
+        $fwrite(cx_trace_file, "dispatch cycle=%0d hart=0 iid=%0d rd=x%0d preg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_preg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_dst_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_preg[6:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_preg_vld) begin
+        $fwrite(cx_trace_file, "dispatch cycle=%0d hart=0 iid=%0d rd=x%0d preg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_preg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_dst_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_preg[6:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_freg_vld) begin
+        $fwrite(cx_trace_file, "fdispatch cycle=%0d hart=0 iid=%0d rd=f%0d fpreg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_vreg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_dstv_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_vreg[5:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_freg_vld) begin
+        $fwrite(cx_trace_file, "fdispatch cycle=%0d hart=0 iid=%0d rd=f%0d fpreg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_vreg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_dstv_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst1_vreg[5:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_freg_vld) begin
+        $fwrite(cx_trace_file, "fdispatch cycle=%0d hart=0 iid=%0d rd=f%0d fpreg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_vreg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_dstv_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst2_vreg[5:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_freg_vld) begin
+        $fwrite(cx_trace_file, "fdispatch cycle=%0d hart=0 iid=%0d rd=f%0d fpreg=%0d\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_vreg_iid[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_dstv_reg[4:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst3_vreg[5:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.iu_idu_ex2_pipe0_wb_preg_vld) begin
+        $fwrite(cx_trace_file, "pregwrite cycle=%0d hart=0 preg=%0d value=0x%016x\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.iu_idu_ex2_pipe0_wb_preg[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.iu_idu_ex2_pipe0_wb_preg_data[63:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.iu_idu_ex2_pipe1_wb_preg_vld) begin
+        $fwrite(cx_trace_file, "pregwrite cycle=%0d hart=0 preg=%0d value=0x%016x\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.iu_idu_ex2_pipe1_wb_preg[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.iu_idu_ex2_pipe1_wb_preg_data[63:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.lsu_idu_wb_pipe3_wb_preg_vld) begin
+        $fwrite(cx_trace_file, "pregwrite cycle=%0d hart=0 preg=%0d value=0x%016x\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.lsu_idu_wb_pipe3_wb_preg[6:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.lsu_idu_wb_pipe3_wb_preg_data[63:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.lsu_idu_wb_pipe3_wb_vreg_fr_vld) begin
+        $fwrite(cx_trace_file, "fpregwrite cycle=%0d hart=0 fpreg=%0d value=0x%016x\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.lsu_idu_wb_pipe3_fwd_vreg[5:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.lsu_idu_wb_pipe3_wb_vreg_fr_data[63:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.vfpu_idu_ex5_pipe6_wb_vreg_fr_vld) begin
+        $fwrite(cx_trace_file, "fpregwrite cycle=%0d hart=0 fpreg=%0d value=0x%016x\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.rbus_pipe6_wb_vreg[5:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.vfpu_idu_ex5_pipe6_wb_vreg_fr_data[63:0]);
+      end
+      if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.vfpu_idu_ex5_pipe7_wb_vreg_fr_vld) begin
+        $fwrite(cx_trace_file, "fpregwrite cycle=%0d hart=0 fpreg=%0d value=0x%016x\n",
+                cycle_count[31:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.rbus_pipe7_wb_vreg[5:0],
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.vfpu_idu_ex5_pipe7_wb_vreg_fr_data[63:0]);
+      end
+      if(`tb_retire0) begin
+        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d",
+                cycle_count[31:0], `retire0_pc,
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit0_iid[6:0]);
+        if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_cp0_expt_vld) begin
+          $fwrite(cx_trace_file, " exc_cause=%0d", `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_expt_vec[4:0]);
+        end
+        $fwrite(cx_trace_file, "\n");
+      end
+      if(`tb_retire1) begin
+        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d\n",
+                cycle_count[31:0], `retire1_pc,
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit1_iid[6:0]);
+      end
+      if(`tb_retire2) begin
+        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d\n",
+                cycle_count[31:0], `retire2_pc,
+                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit2_iid[6:0]);
+      end
+      if(`tb_retire0 || `tb_retire1 || `tb_retire2) begin
+        $fflush(cx_trace_file);
+      end
+    end
+  end
+`endif
+
   always @(posedge clk)
   begin
     cpu_awlen[3:0]   <= `SOC_TOP.x_axi_slave128.awlen[3:0];
@@ -303,29 +445,36 @@ module top(
   
   always @(posedge clk)
   begin
-      if(value0 == 64'h444333222 || value1 == 64'h444333222 || value2 == 64'h444333222)
+      if(!cx_success_seen && !cx_fail_seen && (cpu_awlen[3:0] == 4'b0) && (cpu_awaddr[31:0] == 32'h0004_0000) && cpu_wvalid && `clk_en)
     begin
-      $display("**********************************************");
-      $display("*    simulation finished successfully        *");
-      $display("**********************************************");
-     //#10;
-     FILE = $fopen("run_case.report","w");
-     $fwrite(FILE,"TEST PASS");   
-  
-     $finish;
+      cx_success_seen <= 1'b1;
+      cx_finish_countdown <= 8'd32;
     end
-      else if (value0 == 64'h2382348720 || value1 == 64'h2382348720 || value2 == 64'h444333222)
+      else if(cx_finish_countdown != 8'b0)
     begin
-     $display("**********************************************");
-     $display("*    simulation finished with error          *");
-     $display("**********************************************");
-     //#10;
-     FILE = $fopen("run_case.report","w");
-     $fwrite(FILE,"TEST FAIL");   
-  
-     $finish;
+      cx_finish_countdown <= cx_finish_countdown - 1'b1;
+      if(cx_finish_countdown == 8'd1)
+      begin
+        if(cx_success_seen)
+        begin
+          $display("**********************************************");
+          $display("*    simulation finished successfully        *");
+          $display("**********************************************");
+          FILE = $fopen("run_case.report","w");
+          $fwrite(FILE,"TEST PASS");
+        end
+        else
+        begin
+          $display("**********************************************");
+          $display("*    simulation finished with error          *");
+          $display("**********************************************");
+          FILE = $fopen("run_case.report","w");
+          $fwrite(FILE,"TEST FAIL");
+        end
+        $finish;
+      end
     end
-  
+
     else if((cpu_awlen[3:0] == 4'b0) &&
   //     (cpu_awaddr[31:0] == 32'h6000fff8) &&
   //     (cpu_awaddr[31:0] == 32'h0003fff8) &&
