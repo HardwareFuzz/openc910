@@ -251,7 +251,7 @@ OBJDUMP="${TOOL_EXTENSION}/riscv64-unknown-elf-objdump"
 CONVERT="${SMART}/tests/bin/Srec2vmem"
 CONVERT_EXEC="${WORK}/Srec2vmem"
 TRACE_FILE="${TRACE_DIR}/openc910_trace_hart_00000000.log"
-COV_FILE="${CX_COVERAGE_OUT:-${RUN_DIR}/coverage.dat}"
+COV_FILE="${CX_COVERAGE_OUT:-${TRACE_DIR}/coverage.dat}"
 
 [[ -x "${OBJCOPY}" ]] || { echo "ERROR: objcopy not executable: ${OBJCOPY}" >&2; exit 2; }
 [[ -f "${CONVERT}" ]] || { echo "ERROR: Srec2vmem not found: ${CONVERT}" >&2; exit 2; }
