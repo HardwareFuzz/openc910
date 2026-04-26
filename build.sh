@@ -3,14 +3,24 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./build.sh [--isa rv64|rv64f|rv64fd]... [--cores 1] [--out-dir DIR] [--no-coverage] [--clean]
+Usage: ./build.sh [--isa rv64|rv64f|rv64fd]... [--cores 1]
+                  [--coverage|--coverage-light|--no-coverage]
+                  [--out-dir DIR] [--clean]
 
 Export OpenC910 smart_run runner artifacts (Verilator backend).
+
+Coverage modes share the artifact ABI but use distinct Vtop binaries
+built with different Verilator flags:
+  --no-coverage     Vtop                   (artifact suffix: '')
+  --coverage-light  Vtop with line+user    (artifact suffix: _cov_light)
+  --coverage        Vtop with full coverage (artifact suffix: _cov)
 
 The generated artifacts accept:
   <artifact> --elf PATH [--trace-dir DIR] [--run-dir DIR] [--timeout SEC] [--keep]
 
-Supported: RV64/RV64F/RV64FD labels, one hart, coverage off.
+Coverage artifacts also write a coverage.dat into --run-dir (or into the
+location supplied via env CX_COVERAGE_OUT) by passing +covfile=<path> to
+Vtop. Supported: RV64/RV64F/RV64FD labels, one hart.
 EOF
 }
 
@@ -59,10 +69,6 @@ if [[ "${CORES}" != "1" ]]; then
   echo "ERROR: OpenC910 (cx-build) supports --cores 1 only (got: ${CORES}); use cx-2hart-build for dual hart" >&2
   exit 2
 fi
-if [[ "${COVERAGE_MODE}" != "none" ]]; then
-  echo "ERROR: OpenC910 coverage builds are not supported yet" >&2
-  exit 2
-fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SMART_DIR="${ROOT_DIR}/smart_run"
@@ -71,6 +77,30 @@ OUT_DIR="${OUT_DIR_OPT:-${CX_OUT_DIR:-${OUT_DIR:-${OUT_DIR_DEFAULT}}}}"
 
 mkdir -p "${OUT_DIR}"
 
+cov_suffix() {
+  case "$1" in
+    none)  echo "" ;;
+    light) echo "_cov_light" ;;
+    full)  echo "_cov" ;;
+  esac
+}
+
+work_subdir() {
+  case "$1" in
+    none)  echo "work" ;;
+    light) echo "work_cov_light" ;;
+    full)  echo "work_cov" ;;
+  esac
+}
+
+extra_vlt_args_for_mode() {
+  case "$1" in
+    none)  echo "" ;;
+    light) echo "--coverage-line --coverage-user --coverage-max-width 0" ;;
+    full)  echo "--coverage" ;;
+  esac
+}
+
 validate_isa() {
   case "$1" in
     rv64|rv64f|rv64fd) ;;
@@ -78,35 +108,70 @@ validate_isa() {
   esac
 }
 
-# Build the Verilator simulator (CX_TRACE-enabled) once.
+# Build the Verilator simulator for the given coverage mode into its own
+# work_<mode> directory so the three modes can coexist on disk.
 build_verilator() {
   command -v verilator >/dev/null 2>&1 || die "verilator not found in PATH"
 
-  local vtop="${SMART_DIR}/work/obj_dir/Vtop"
+  local mode="$1"
+  local subdir
+  subdir="$(work_subdir "${mode}")"
+  local work_dir="${SMART_DIR}/${subdir}"
+  local vtop="${work_dir}/obj_dir/Vtop"
+
   if (( CLEAN )); then
-    rm -rf "${SMART_DIR}/work"
+    rm -rf "${work_dir}"
   fi
   if [[ -x "${vtop}" ]]; then
     return 0
   fi
 
-  mkdir -p "${SMART_DIR}/work"
-  echo "[openc910] verilating with CX_TRACE..."
+  # The smart_run Makefile hard-codes ./work as its build directory.
+  # For non-default coverage modes we relocate that directory aside,
+  # build into ./work, then move the result into work_<mode>.
+  local stash_dir=""
+  if [[ "${subdir}" != "work" ]]; then
+    if [[ -e "${SMART_DIR}/work" ]]; then
+      stash_dir="${SMART_DIR}/work.stash.$$"
+      mv "${SMART_DIR}/work" "${stash_dir}"
+    fi
+    mkdir -p "${SMART_DIR}/work"
+  else
+    mkdir -p "${SMART_DIR}/work"
+  fi
+
+  local extra
+  extra="$(extra_vlt_args_for_mode "${mode}")"
+
+  echo "[openc910] verilating with CX_TRACE (mode=${mode})..."
   make -C "${SMART_DIR}" compile \
     SIM=verilator \
     THREADS="${CX_VERILATOR_THREADS:-4}" \
     CODE_BASE_PATH="${ROOT_DIR}/C910_RTL_FACTORY" \
-    SIMULATOR_DEF="-cc --exe --top-module top +define+CX_TRACE"
-  echo "[openc910] compiling Vtop..."
+    SIMULATOR_DEF="-cc --exe --top-module top +define+CX_TRACE ${extra}"
+  echo "[openc910] compiling Vtop (mode=${mode})..."
   make -C "${SMART_DIR}" buildVerilator \
     THREADS="${CX_VERILATOR_THREADS:-4}"
+
+  if [[ "${subdir}" != "work" ]]; then
+    rm -rf "${work_dir}"
+    mv "${SMART_DIR}/work" "${work_dir}"
+    if [[ -n "${stash_dir}" ]]; then
+      mv "${stash_dir}" "${SMART_DIR}/work"
+    fi
+  fi
 
   [[ -x "${vtop}" ]] || die "Vtop binary missing after build: ${vtop}"
 }
 
 emit_runner() {
   local isa="$1"
-  local artifact_name="openc910_${isa}_${CORES}c"
+  local mode="$2"
+  local subdir
+  subdir="$(work_subdir "${mode}")"
+  local suffix
+  suffix="$(cov_suffix "${mode}")"
+  local artifact_name="openc910_${isa}_${CORES}c${suffix}"
   local out_file="${OUT_DIR}/${artifact_name}"
 
   if (( CLEAN )); then
@@ -169,7 +234,7 @@ fi
 [[ -n "${TOOL_EXTENSION:-}" ]] || { echo "ERROR: TOOL_EXTENSION must point to riscv64-unknown-elf toolchain bin directory, or RISCV must point to the RISC-V toolchain prefix" >&2; exit 2; }
 command -v timeout >/dev/null 2>&1 || { echo "ERROR: timeout command is required" >&2; exit 2; }
 
-VTOP="${CORE_ROOT}/smart_run/work/obj_dir/Vtop"
+VTOP="${CORE_ROOT}/smart_run/__WORK_SUBDIR__/obj_dir/Vtop"
 [[ -x "${VTOP}" ]] || { echo "ERROR: Vtop binary missing at ${VTOP} (run build.sh)" >&2; exit 2; }
 
 TRACE_DIR="${TRACE_DIR:-${PWD}}"
@@ -186,6 +251,7 @@ OBJDUMP="${TOOL_EXTENSION}/riscv64-unknown-elf-objdump"
 CONVERT="${SMART}/tests/bin/Srec2vmem"
 CONVERT_EXEC="${WORK}/Srec2vmem"
 TRACE_FILE="${TRACE_DIR}/openc910_trace_hart_00000000.log"
+COV_FILE="${CX_COVERAGE_OUT:-${RUN_DIR}/coverage.dat}"
 
 [[ -x "${OBJCOPY}" ]] || { echo "ERROR: objcopy not executable: ${OBJCOPY}" >&2; exit 2; }
 [[ -f "${CONVERT}" ]] || { echo "ERROR: Srec2vmem not found: ${CONVERT}" >&2; exit 2; }
@@ -202,18 +268,18 @@ cp "${ELF}" "${WORK}/case.elf"
 (
   cd "${WORK}"
   : > "${TRACE_FILE}"
-  timeout "${TIMEOUT_SEC}" "${VTOP}" "+cx_trace=${TRACE_FILE}"
+  timeout "${TIMEOUT_SEC}" "${VTOP}" "+cx_trace=${TRACE_FILE}" "+covfile=${COV_FILE}"
 )
 RUNNER
 
-  sed -i "s#__CORE_ROOT__#${ROOT_DIR}#g; s#__ARTIFACT_NAME__#${artifact_name}#g" "${out_file}"
+  sed -i "s#__CORE_ROOT__#${ROOT_DIR}#g; s#__ARTIFACT_NAME__#${artifact_name}#g; s#__WORK_SUBDIR__#${subdir}#g" "${out_file}"
   chmod +x "${out_file}"
   echo "Exported ${out_file}"
 }
 
-build_verilator
+build_verilator "${COVERAGE_MODE}"
 
 for isa in "${ISAS[@]}"; do
   validate_isa "${isa}"
-  emit_runner "${isa}"
+  emit_runner "${isa}" "${COVERAGE_MODE}"
 done
