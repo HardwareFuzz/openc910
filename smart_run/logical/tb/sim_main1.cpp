@@ -7,6 +7,8 @@
 
 // For std::unique_ptr
 #include <memory>
+#include <string>
+#include <cstring>
 
 // Include common routines
 #include <verilated.h>
@@ -106,10 +108,27 @@ int main(int argc, char** argv, char** env) {
     // Final model cleanup
     top->final();
 
-    // Coverage analysis (calling write only after the test is known to pass)
+    // Coverage analysis (calling write only after the test is known to pass).
+    // Honour +covfile=<path> so the host-side runner can route output without
+    // depending on cwd-relative defaults; fall back to logs/coverage.dat.
 #if VM_COVERAGE
-    Verilated::mkdir("logs");
-    contextp->coveragep()->write("logs/coverage.dat");
+    {
+        const char* covfile_arg = contextp->commandArgsPlusMatch("covfile=");
+        std::string covfile_path = "logs/coverage.dat";
+        if (covfile_arg && covfile_arg[0] != '\0') {
+            const char* eq = std::strchr(covfile_arg, '=');
+            if (eq && eq[1] != '\0') {
+                covfile_path = eq + 1;
+            }
+        }
+        size_t slash = covfile_path.find_last_of('/');
+        if (slash != std::string::npos && slash > 0) {
+            Verilated::mkdir(covfile_path.substr(0, slash).c_str());
+        } else {
+            Verilated::mkdir("logs");
+        }
+        contextp->coveragep()->write(covfile_path.c_str());
+    }
 #endif
 
     // Return good completion status
