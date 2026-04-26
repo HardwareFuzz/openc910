@@ -288,6 +288,7 @@ module top(
   reg [3:0]  cpu_awlen;
   reg [15:0] cpu_wstrb;
   reg        cpu_wvalid;
+  reg [127:0] cpu_wdata;
   reg [63:0] value0;
   reg [63:0] value1;
   reg [63:0] value2;
@@ -431,14 +432,9 @@ module top(
       if(`tb_retire0 || `tb_retire1 || `tb_retire2) begin
         $fflush(cx_trace_file);
       end
-    end
-  end
-`endif
-
-`ifdef CX_TRACE
-  always @(posedge clk)
-  begin
-    if(cx_trace_file != 0) begin
+      // === hart 1 tracing inside the same always block to keep $fwrite output
+      // === serialized; Verilator does not guarantee ordering across separate
+      // === always blocks writing to the same file descriptor.
       if(`CPU_TOP.x_ct_top_1.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_preg_vld) begin
         $fwrite(cx_trace_file, "dispatch cycle=%0d hart=1 iid=%0d rd=x%0d preg=%0d\n",
                 cycle_count[31:0],
@@ -578,6 +574,7 @@ module top(
     cpu_awaddr[31:0] <= `SOC_TOP.x_axi_slave128.mem_addr[31:0];
     cpu_wvalid       <= `SOC_TOP.biu_pad_wvalid;
     cpu_wstrb        <= `SOC_TOP.biu_pad_wstrb;
+    cpu_wdata        <= `SOC_TOP.biu_pad_wdata;
     // value0           <= `CPU_TOP.core0_pad_wb0_data[63:0];
     // value1           <= `CPU_TOP.core0_pad_wb1_data[63:0];
     // value2           <= `CPU_TOP.core0_pad_wb2_data[63:0];
