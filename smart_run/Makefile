@@ -28,7 +28,7 @@ VERILATOR_FLAGS += -cc --exe
 # Generate makefile dependencies (not shown as complicates the Makefile)
 #VERILATOR_FLAGS += -MMD
 # Optimize
-VERILATOR_FLAGS += -Os -x-assign 0
+VERILATOR_FLAGS += -O3 -x-assign 0
 # lint-only
 VERILATOR_FLAGS += -lint-only
 # Warn abount lint issues; may not want this on less solid designs
@@ -49,7 +49,7 @@ VERILATOR_FLAGS += -cc --exe
 # Generate makefile dependencies (not shown as complicates the Makefile)
 #VERILATOR_FLAGS += -MMD
 # Optimize
-VERILATOR_FLAGS += -Os -x-assign 0
+VERILATOR_FLAGS += -O3 -x-assign 0
 # lint-only
 VERILATOR_FLAGS += -lint-only
 # Warn abount lint issues; may not want this on less solid designs
@@ -105,7 +105,7 @@ else
           SIMULATOR_LOG := 
         else
             ifeq ($(SIM), verilator)
-              SIMULATOR_OPT := -Os -x-assign 0 -Wno-fatal --threads ${THREADS}
+              SIMULATOR_OPT := -O3 -x-assign 0 --timing -Wno-fatal --threads ${THREADS}
               SIMULATOR_DEF := -cc --exe --top-module top 
               SIMULATOR_LOG := 
             else
