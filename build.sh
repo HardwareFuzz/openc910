@@ -55,8 +55,8 @@ if [[ ${#ISAS[@]} -eq 0 ]]; then
   ISAS=(rv64)
 fi
 
-if [[ "${CORES}" != "1" ]]; then
-  echo "ERROR: OpenC910 (cx-build) supports --cores 1 only (got: ${CORES}); use cx-2hart-build for dual hart" >&2
+if [[ "${CORES}" != "1" && "${CORES}" != "2" ]]; then
+  echo "ERROR: OpenC910 supports --cores 1 or 2 (got: ${CORES})" >&2
   exit 2
 fi
 if [[ "${COVERAGE_MODE}" != "none" ]]; then
