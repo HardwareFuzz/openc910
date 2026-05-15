@@ -68,8 +68,154 @@ module top(
   
   wire uart0_sin;
   wire [7:0]b_pad_gpio_porta;
-  
+  wire [15:0] cx_lsu_dbg_st_bytes_vld;
+  wire [39:0] cx_lsu_dbg_st_addr;
+  wire [63:0] cx_lsu_dbg_st_data;
+  wire [6:0]  cx_lsu_dbg_st_iid;
+  wire        cx_lsu_dbg_st_req;
+  wire        cx_wmb_ce_create_vld;
+  wire        cx_wmb_ce_create_merge;
+  wire [7:0]  cx_wmb_ce_create_merge_ptr;
+  wire [7:0]  cx_wmb_entry_create_vld;
+  wire [6:0]  cx_wmb_ce_iid;
+  wire [39:0] cx_wmb_ce_addr;
+  wire [15:0] cx_wmb_ce_bytes_vld;
+  wire [127:0] cx_wmb_ce_data128;
+  wire        cx_wmb_st_wb_cmplt_req;
+  wire [7:0]  cx_wmb_st_wb_cmplt_ptr;
+  wire [6:0]  cx_wmb_st_wb_iid;
+  wire        cx_wmb_write_dcache_success;
+  wire [7:0]  cx_wmb_write_dcache_ptr;
+  wire [6:0]  cx_wmb_write_dcache_iid;
+  wire [39:0] cx_wmb_write_dcache_addr;
+  wire [15:0] cx_wmb_write_dcache_bytes_vld;
+  wire [127:0] cx_wmb_write_dcache_data;
+  wire [7:0]  cx_wmb_write_ptr;
+  wire [6:0]  cx_wmb_write_iid;
+  wire [7:0]  cx_wmb_data_ptr;
+  wire [6:0]  cx_wmb_data_iid;
+  wire        cx_wmb_biu_aw_req;
+  wire        cx_wmb_biu_aw_grnt;
+  wire [39:0] cx_wmb_biu_aw_addr;
+  wire [1:0]  cx_wmb_biu_aw_len;
+  wire [2:0]  cx_wmb_biu_aw_size;
+  wire        cx_wmb_biu_w_req;
+  wire        cx_wmb_biu_w_grnt;
+  wire [127:0] cx_wmb_biu_w_data;
+  wire [15:0] cx_wmb_biu_w_strb;
+  wire        cx_wmb_biu_w_last;
+  wire [39:0] cx_wmb_complete_addr;
+  wire [15:0] cx_wmb_complete_bytes_vld;
+  wire [127:0] cx_wmb_complete_data128;
+  reg         cx_pending_commit_valid [0:255];
+  reg [6:0]   cx_pending_commit_iid [0:255];
+  reg [39:0]  cx_pending_commit_pc [0:255];
+  reg [31:0]  cx_pending_commit_cycle [0:255];
+  reg         cx_pending_store_valid [0:255];
+  reg [6:0]   cx_pending_store_iid [0:255];
+  reg [15:0]  cx_pending_store_bytes_vld [0:255];
+  reg [39:0]  cx_pending_store_addr [0:255];
+  reg [63:0]  cx_pending_store_data [0:255];
+  reg [31:0]  cx_pending_store_cycle [0:255];
+  integer     cx_pending_idx;
+
   assign pad_yy_gate_clk_en_b = 1'b1;
+  assign cx_lsu_dbg_st_bytes_vld = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_sq.sq_dbg_st_bytes_vld[15:0];
+  assign cx_lsu_dbg_st_addr      = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_sq.sq_dbg_st_addr_ff[39:0];
+  assign cx_lsu_dbg_st_data      = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_sq.sq_dbg_st_data_ff[63:0];
+  assign cx_lsu_dbg_st_iid       = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_sq.sq_dbg_st_iid_ff[6:0];
+  assign cx_lsu_dbg_st_req       = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_sq.sq_dbg_st_req_ff;
+  assign cx_wmb_ce_create_vld      = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_ce_create_vld;
+  assign cx_wmb_ce_create_merge    = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_ce_create_merge;
+  assign cx_wmb_ce_create_merge_ptr = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_ce_create_merge_ptr[7:0];
+  assign cx_wmb_entry_create_vld   = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_create_vld[7:0];
+  assign cx_wmb_ce_iid             = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_ce_iid[6:0];
+  assign cx_wmb_ce_addr            = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_ce_addr[39:0];
+  assign cx_wmb_ce_bytes_vld       = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_ce_bytes_vld[15:0];
+  assign cx_wmb_ce_data128         = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_ce_data128[127:0];
+  assign cx_wmb_st_wb_cmplt_req    = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_st_wb_cmplt_req;
+  assign cx_wmb_st_wb_cmplt_ptr    = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_st_wb_cmplt_ptr[7:0];
+  assign cx_wmb_st_wb_iid          = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_st_wb_iid[6:0];
+  assign cx_wmb_write_dcache_success = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_write_dcache_success_ori;
+  assign cx_wmb_write_dcache_ptr     = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_write_dcache_ptr[7:0];
+  assign cx_wmb_write_dcache_iid     = {7{cx_wmb_write_dcache_ptr[0]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_0[6:0]
+                                     | {7{cx_wmb_write_dcache_ptr[1]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_1[6:0]
+                                     | {7{cx_wmb_write_dcache_ptr[2]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_2[6:0]
+                                     | {7{cx_wmb_write_dcache_ptr[3]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_3[6:0]
+                                     | {7{cx_wmb_write_dcache_ptr[4]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_4[6:0]
+                                     | {7{cx_wmb_write_dcache_ptr[5]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_5[6:0]
+                                     | {7{cx_wmb_write_dcache_ptr[6]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_6[6:0]
+                                     | {7{cx_wmb_write_dcache_ptr[7]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_7[6:0];
+  assign cx_wmb_write_dcache_addr    = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_write_dcache_addr[39:0];
+  assign cx_wmb_write_dcache_bytes_vld = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_write_dcache_bytes_vld[15:0];
+  assign cx_wmb_write_dcache_data    = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_write_dcache_data[127:0];
+  assign cx_wmb_write_ptr            = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_write_ptr[7:0];
+  assign cx_wmb_write_iid            = {7{cx_wmb_write_ptr[0]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_0[6:0]
+                                     | {7{cx_wmb_write_ptr[1]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_1[6:0]
+                                     | {7{cx_wmb_write_ptr[2]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_2[6:0]
+                                     | {7{cx_wmb_write_ptr[3]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_3[6:0]
+                                     | {7{cx_wmb_write_ptr[4]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_4[6:0]
+                                     | {7{cx_wmb_write_ptr[5]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_5[6:0]
+                                     | {7{cx_wmb_write_ptr[6]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_6[6:0]
+                                     | {7{cx_wmb_write_ptr[7]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_7[6:0];
+  assign cx_wmb_data_ptr             = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_data_ptr[7:0];
+  assign cx_wmb_data_iid             = {7{cx_wmb_data_ptr[0]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_0[6:0]
+                                     | {7{cx_wmb_data_ptr[1]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_1[6:0]
+                                     | {7{cx_wmb_data_ptr[2]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_2[6:0]
+                                     | {7{cx_wmb_data_ptr[3]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_3[6:0]
+                                     | {7{cx_wmb_data_ptr[4]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_4[6:0]
+                                     | {7{cx_wmb_data_ptr[5]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_5[6:0]
+                                     | {7{cx_wmb_data_ptr[6]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_6[6:0]
+                                     | {7{cx_wmb_data_ptr[7]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_iid_7[6:0];
+  assign cx_wmb_biu_aw_req           = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_aw_req;
+  assign cx_wmb_biu_aw_grnt          = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.bus_arb_wmb_aw_grnt;
+  assign cx_wmb_biu_aw_addr          = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_aw_addr[39:0];
+  assign cx_wmb_biu_aw_len           = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_aw_len[1:0];
+  assign cx_wmb_biu_aw_size          = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_aw_size[2:0];
+  assign cx_wmb_biu_w_req            = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_w_req;
+  assign cx_wmb_biu_w_grnt           = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.bus_arb_wmb_w_grnt;
+  assign cx_wmb_biu_w_data           = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_w_data[127:0];
+  assign cx_wmb_biu_w_strb           = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_w_strb[15:0];
+  assign cx_wmb_biu_w_last           = `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_biu_w_last;
+  assign cx_wmb_complete_addr      = {40{cx_wmb_st_wb_cmplt_ptr[0]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_0[39:0]
+                                   | {40{cx_wmb_st_wb_cmplt_ptr[1]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_1[39:0]
+                                   | {40{cx_wmb_st_wb_cmplt_ptr[2]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_2[39:0]
+                                   | {40{cx_wmb_st_wb_cmplt_ptr[3]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_3[39:0]
+                                   | {40{cx_wmb_st_wb_cmplt_ptr[4]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_4[39:0]
+                                   | {40{cx_wmb_st_wb_cmplt_ptr[5]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_5[39:0]
+                                   | {40{cx_wmb_st_wb_cmplt_ptr[6]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_6[39:0]
+                                   | {40{cx_wmb_st_wb_cmplt_ptr[7]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_addr_7[39:0];
+  assign cx_wmb_complete_bytes_vld = {16{cx_wmb_st_wb_cmplt_ptr[0]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_0[15:0]
+                                   | {16{cx_wmb_st_wb_cmplt_ptr[1]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_1[15:0]
+                                   | {16{cx_wmb_st_wb_cmplt_ptr[2]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_2[15:0]
+                                   | {16{cx_wmb_st_wb_cmplt_ptr[3]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_3[15:0]
+                                   | {16{cx_wmb_st_wb_cmplt_ptr[4]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_4[15:0]
+                                   | {16{cx_wmb_st_wb_cmplt_ptr[5]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_5[15:0]
+                                   | {16{cx_wmb_st_wb_cmplt_ptr[6]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_6[15:0]
+                                   | {16{cx_wmb_st_wb_cmplt_ptr[7]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_bytes_vld_7[15:0];
+  assign cx_wmb_complete_data128   = {128{cx_wmb_st_wb_cmplt_ptr[0]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_0[127:0]
+                                   | {128{cx_wmb_st_wb_cmplt_ptr[1]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_1[127:0]
+                                   | {128{cx_wmb_st_wb_cmplt_ptr[2]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_2[127:0]
+                                   | {128{cx_wmb_st_wb_cmplt_ptr[3]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_3[127:0]
+                                   | {128{cx_wmb_st_wb_cmplt_ptr[4]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_4[127:0]
+                                   | {128{cx_wmb_st_wb_cmplt_ptr[5]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_5[127:0]
+                                   | {128{cx_wmb_st_wb_cmplt_ptr[6]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_6[127:0]
+                                   | {128{cx_wmb_st_wb_cmplt_ptr[7]}} & `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_wmb.wmb_entry_data_7[127:0];
+
+  initial begin
+    for(cx_pending_idx = 0; cx_pending_idx < 256; cx_pending_idx = cx_pending_idx + 1) begin
+      cx_pending_commit_valid[cx_pending_idx] = 1'b0;
+      cx_pending_commit_iid[cx_pending_idx] = 7'b0;
+      cx_pending_commit_pc[cx_pending_idx] = 40'b0;
+      cx_pending_commit_cycle[cx_pending_idx] = 32'b0;
+      cx_pending_store_valid[cx_pending_idx] = 1'b0;
+      cx_pending_store_iid[cx_pending_idx] = 7'b0;
+      cx_pending_store_bytes_vld[cx_pending_idx] = 16'b0;
+      cx_pending_store_addr[cx_pending_idx] = 40'b0;
+      cx_pending_store_data[cx_pending_idx] = 64'b0;
+      cx_pending_store_cycle[cx_pending_idx] = 32'b0;
+    end
+  end
   
   //initial
   //begin
@@ -216,6 +362,289 @@ module top(
     end
   end
 
+  function [63:0] cx_mask_from_bytes_vld;
+    input [15:0] bytes_vld;
+    integer idx;
+    reg [63:0] mask;
+    begin
+      mask = 64'b0;
+      // The trace data is 64-bit wide, so byte-valid bits are paired down to
+      // 8 lanes to match the plugin's memory-width model.
+      for(idx = 0; idx < 8; idx = idx + 1) begin
+        if(bytes_vld[idx] || bytes_vld[idx + 8]) begin
+          mask[idx] = 1'b1;
+        end
+      end
+      cx_mask_from_bytes_vld = mask;
+    end
+  endfunction
+
+  task automatic cx_emit_store_line;
+    input [31:0] event_cycle;
+    input [31:0] commit_cycle;
+    input [39:0] commit_pc;
+    input [6:0]  iid;
+    input [39:0] addr;
+    input [15:0] bytes_vld;
+    input [63:0] data;
+    begin
+      $fwrite(cx_trace_file,
+              "store cycle=%0d commit_cycle=%0d hart=0 pc=0x%010x iid=%0d mem_addr=0x%010x mem_mask=0x%016x mem_data=0x%016x\n",
+              event_cycle,
+              commit_cycle,
+              commit_pc,
+              iid,
+              addr,
+              cx_mask_from_bytes_vld(bytes_vld),
+              data);
+      $fflush(cx_trace_file);
+    end
+  endtask
+
+  task automatic cx_emit_store_raw_line;
+    input [31:0] event_cycle;
+    input [6:0]  iid;
+    input [39:0] addr;
+    input [15:0] bytes_vld;
+    input [63:0] data;
+    begin
+      $fwrite(cx_trace_file,
+              "store_raw cycle=%0d hart=0 iid=%0d raw_addr=0x%010x raw_bytes_vld=0x%04x raw_data=0x%016x\n",
+              event_cycle,
+              iid,
+              addr,
+              bytes_vld,
+              data);
+      $fflush(cx_trace_file);
+    end
+  endtask
+
+  task automatic cx_emit_store_link_line;
+    input [31:0] event_cycle;
+    input [6:0]  iid;
+    input [7:0]  entry_ptr;
+    input        merge_event;
+    input [39:0] addr;
+    input [15:0] bytes_vld;
+    input [127:0] data128;
+    begin
+      if(entry_ptr != 8'b0) begin
+        if(merge_event) begin
+          $fwrite(cx_trace_file,
+                  "storelink cycle=%0d hart=0 kind=merge iid=%0d entry=0x%02x addr=0x%010x bytes_vld=0x%04x data=0x%032x\n",
+                  event_cycle,
+                  iid,
+                  entry_ptr,
+                  addr,
+                  bytes_vld,
+                  data128);
+        end else begin
+          $fwrite(cx_trace_file,
+                  "storelink cycle=%0d hart=0 kind=create iid=%0d entry=0x%02x addr=0x%010x bytes_vld=0x%04x data=0x%032x\n",
+                  event_cycle,
+                  iid,
+                  entry_ptr,
+                  addr,
+                  bytes_vld,
+                  data128);
+        end
+        $fflush(cx_trace_file);
+      end
+    end
+  endtask
+
+  task automatic cx_emit_store_complete_line;
+    input [31:0] event_cycle;
+    input [6:0]  iid;
+    input [7:0]  entry_ptr;
+    input [39:0] addr;
+    input [15:0] bytes_vld;
+    input [127:0] data128;
+    begin
+      if(entry_ptr != 8'b0) begin
+        $fwrite(cx_trace_file,
+                "storecomplete cycle=%0d hart=0 entry=0x%02x iid=%0d addr=0x%010x bytes_vld=0x%04x data=0x%032x\n",
+                event_cycle,
+                entry_ptr,
+                iid,
+                addr,
+                bytes_vld,
+                data128);
+        $fflush(cx_trace_file);
+      end
+    end
+  endtask
+
+  task automatic cx_emit_store_final_dcache_line;
+    input [31:0] event_cycle;
+    input [6:0]  iid;
+    input [7:0]  entry_ptr;
+    input [39:0] addr;
+    input [15:0] bytes_vld;
+    input [127:0] data128;
+    begin
+      if(entry_ptr != 8'b0) begin
+        $fwrite(cx_trace_file,
+                "storefinal cycle=%0d hart=0 kind=dcache iid=%0d entry=0x%02x addr=0x%010x bytes_vld=0x%04x data=0x%032x\n",
+                event_cycle,
+                iid,
+                entry_ptr,
+                addr,
+                bytes_vld,
+                data128);
+        $fflush(cx_trace_file);
+      end
+    end
+  endtask
+
+  task automatic cx_emit_store_final_biu_aw_line;
+    input [31:0] event_cycle;
+    input [6:0]  iid;
+    input [7:0]  entry_ptr;
+    input [39:0] addr;
+    input [1:0]  burst_len;
+    input [2:0]  burst_size;
+    begin
+      if(entry_ptr != 8'b0) begin
+        $fwrite(cx_trace_file,
+                "storefinal cycle=%0d hart=0 kind=biu_aw iid=%0d entry=0x%02x addr=0x%010x len=0x%01x size=0x%01x\n",
+                event_cycle,
+                iid,
+                entry_ptr,
+                addr,
+                burst_len,
+                burst_size);
+        $fflush(cx_trace_file);
+      end
+    end
+  endtask
+
+  task automatic cx_emit_store_final_biu_w_line;
+    input [31:0] event_cycle;
+    input [6:0]  iid;
+    input [7:0]  entry_ptr;
+    input [15:0] bytes_vld;
+    input [127:0] data128;
+    input        last_beat;
+    begin
+      if(entry_ptr != 8'b0) begin
+        $fwrite(cx_trace_file,
+                "storefinal cycle=%0d hart=0 kind=biu_w iid=%0d entry=0x%02x bytes_vld=0x%04x data=0x%032x last=%0d\n",
+                event_cycle,
+                iid,
+                entry_ptr,
+                bytes_vld,
+                data128,
+                last_beat);
+        $fflush(cx_trace_file);
+      end
+    end
+  endtask
+
+  task automatic cx_try_match_commit_slot;
+    input integer commit_slot;
+    integer store_slot;
+    begin
+      store_slot = -1;
+      for(cx_pending_idx = 0; cx_pending_idx < 256; cx_pending_idx = cx_pending_idx + 1) begin
+        if(store_slot < 0
+           && cx_pending_store_valid[cx_pending_idx]
+           && cx_pending_store_iid[cx_pending_idx] == cx_pending_commit_iid[commit_slot]) begin
+          store_slot = cx_pending_idx;
+        end
+      end
+      if(store_slot >= 0) begin
+        cx_emit_store_line(
+          cx_pending_store_cycle[store_slot],
+          cx_pending_commit_cycle[commit_slot],
+          cx_pending_commit_pc[commit_slot],
+          cx_pending_commit_iid[commit_slot],
+          cx_pending_store_addr[store_slot],
+          cx_pending_store_bytes_vld[store_slot],
+          cx_pending_store_data[store_slot]
+        );
+        cx_pending_commit_valid[commit_slot] = 1'b0;
+        cx_pending_store_valid[store_slot] = 1'b0;
+      end
+    end
+  endtask
+
+  task automatic cx_queue_pending_commit;
+    input [6:0]  iid;
+    input [39:0] pc;
+    input [31:0] commit_cycle;
+    integer slot;
+    begin
+      slot = -1;
+      for(cx_pending_idx = 0; cx_pending_idx < 256; cx_pending_idx = cx_pending_idx + 1) begin
+        if(slot < 0 && !cx_pending_commit_valid[cx_pending_idx]) begin
+          slot = cx_pending_idx;
+        end
+      end
+      if(slot >= 0) begin
+        cx_pending_commit_valid[slot] = 1'b1;
+        cx_pending_commit_iid[slot] = iid;
+        cx_pending_commit_pc[slot] = pc;
+        cx_pending_commit_cycle[slot] = commit_cycle;
+        cx_try_match_commit_slot(slot);
+      end
+    end
+  endtask
+
+  task automatic cx_try_match_store_slot;
+    input integer store_slot;
+    integer commit_slot;
+    begin
+      commit_slot = -1;
+      for(cx_pending_idx = 0; cx_pending_idx < 256; cx_pending_idx = cx_pending_idx + 1) begin
+        if(commit_slot < 0
+           && cx_pending_commit_valid[cx_pending_idx]
+           && cx_pending_commit_iid[cx_pending_idx] == cx_pending_store_iid[store_slot]) begin
+          commit_slot = cx_pending_idx;
+        end
+      end
+      if(commit_slot >= 0) begin
+        cx_emit_store_line(
+          cx_pending_store_cycle[store_slot],
+          cx_pending_commit_cycle[commit_slot],
+          cx_pending_commit_pc[commit_slot],
+          cx_pending_commit_iid[commit_slot],
+          cx_pending_store_addr[store_slot],
+          cx_pending_store_bytes_vld[store_slot],
+          cx_pending_store_data[store_slot]
+        );
+        cx_pending_store_valid[store_slot] = 1'b0;
+        cx_pending_commit_valid[commit_slot] = 1'b0;
+      end
+    end
+  endtask
+
+  task automatic cx_queue_pending_store;
+    input [31:0] event_cycle;
+    input [6:0]  iid;
+    input [39:0] addr;
+    input [15:0] bytes_vld;
+    input [63:0] data;
+    integer slot;
+    begin
+      slot = -1;
+      for(cx_pending_idx = 0; cx_pending_idx < 256; cx_pending_idx = cx_pending_idx + 1) begin
+        if(slot < 0 && !cx_pending_store_valid[cx_pending_idx]) begin
+          slot = cx_pending_idx;
+        end
+      end
+      if(slot >= 0) begin
+        cx_pending_store_valid[slot] = 1'b1;
+        cx_pending_store_iid[slot] = iid;
+        cx_pending_store_addr[slot] = addr;
+        cx_pending_store_bytes_vld[slot] = bytes_vld;
+        cx_pending_store_data[slot] = data;
+        cx_pending_store_cycle[slot] = event_cycle;
+        cx_try_match_store_slot(slot);
+      end
+    end
+  endtask
+
   integer clkCnt;
   always@(posedge clk) begin
     clkCnt = clkCnt + 1;
@@ -310,7 +739,79 @@ module top(
 
   always @(posedge clk)
   begin
-    if(cx_trace_file != 0) begin
+      if(cx_trace_file != 0) begin
+      if(cx_lsu_dbg_st_req) begin
+        cx_emit_store_raw_line(
+          cycle_count[31:0],
+          cx_lsu_dbg_st_iid,
+          cx_lsu_dbg_st_addr,
+          cx_lsu_dbg_st_bytes_vld,
+          cx_lsu_dbg_st_data
+        );
+      end
+      if(cx_wmb_ce_create_vld) begin
+        if(cx_wmb_ce_create_merge) begin
+          cx_emit_store_link_line(
+            cycle_count[31:0],
+            cx_wmb_ce_iid,
+            cx_wmb_ce_create_merge_ptr,
+            1'b1,
+            cx_wmb_ce_addr,
+            cx_wmb_ce_bytes_vld,
+            cx_wmb_ce_data128
+          );
+        end else begin
+          cx_emit_store_link_line(
+            cycle_count[31:0],
+            cx_wmb_ce_iid,
+            cx_wmb_entry_create_vld,
+            1'b0,
+            cx_wmb_ce_addr,
+            cx_wmb_ce_bytes_vld,
+            cx_wmb_ce_data128
+          );
+        end
+      end
+      if(cx_wmb_st_wb_cmplt_req) begin
+        cx_emit_store_complete_line(
+          cycle_count[31:0],
+          cx_wmb_st_wb_iid,
+          cx_wmb_st_wb_cmplt_ptr,
+          cx_wmb_complete_addr,
+          cx_wmb_complete_bytes_vld,
+          cx_wmb_complete_data128
+        );
+      end
+      if(cx_wmb_write_dcache_success) begin
+        cx_emit_store_final_dcache_line(
+          cycle_count[31:0],
+          cx_wmb_write_dcache_iid,
+          cx_wmb_write_dcache_ptr,
+          cx_wmb_write_dcache_addr,
+          cx_wmb_write_dcache_bytes_vld,
+          cx_wmb_write_dcache_data
+        );
+      end
+      if(cx_wmb_biu_aw_req && cx_wmb_biu_aw_grnt) begin
+        cx_emit_store_final_biu_aw_line(
+          cycle_count[31:0],
+          cx_wmb_write_iid,
+          cx_wmb_write_ptr,
+          cx_wmb_biu_aw_addr,
+          cx_wmb_biu_aw_len,
+          cx_wmb_biu_aw_size
+        );
+      end
+      if(cx_wmb_biu_w_req && cx_wmb_biu_w_grnt) begin
+        cx_emit_store_final_biu_w_line(
+          cycle_count[31:0],
+          cx_wmb_data_iid,
+          cx_wmb_data_ptr,
+          cx_wmb_biu_w_strb,
+          cx_wmb_biu_w_data,
+          cx_wmb_biu_w_last
+        );
+      end
       if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.idu_rtu_pst_dis_inst0_preg_vld) begin
         $fwrite(cx_trace_file, "dispatch cycle=%0d hart=0 iid=%0d rd=x%0d preg=%0d\n",
                 cycle_count[31:0],
@@ -411,16 +912,24 @@ module top(
           $fwrite(cx_trace_file, " exc_cause=%0d", `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_expt_vec[4:0]);
         end
         $fwrite(cx_trace_file, "\n");
+        if(`CPU_TOP.x_ct_top_0.x_ct_core.rtu_ifu_retire_inst0_store) begin
+        end
       end
       if(`tb_retire1) begin
-        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d\n",
+        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d",
                 cycle_count[31:0], `retire1_pc,
                 `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit1_iid[6:0]);
+        $fwrite(cx_trace_file, "\n");
+        if(`CPU_TOP.x_ct_top_0.x_ct_core.rtu_ifu_retire_inst1_store) begin
+        end
       end
       if(`tb_retire2) begin
-        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d\n",
+        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d",
                 cycle_count[31:0], `retire2_pc,
                 `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit2_iid[6:0]);
+        $fwrite(cx_trace_file, "\n");
+        if(`CPU_TOP.x_ct_top_0.x_ct_core.rtu_ifu_retire_inst2_store) begin
+        end
       end
       if(`tb_retire0 || `tb_retire1 || `tb_retire2) begin
         $fflush(cx_trace_file);
