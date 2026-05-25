@@ -7,20 +7,17 @@ Usage: ./build.sh [--isa rv64|rv64f|rv64fd]... [--cores 1]
                   [--coverage|--coverage-light|--no-coverage]
                   [--out-dir DIR] [--clean]
 
-Export OpenC910 smart_run runner artifacts (Verilator backend).
+Export OpenC910 smart_run Verilator binaries.
 
-Coverage modes share the artifact ABI but use distinct Vtop binaries
+Coverage modes share the same simulator interface but use distinct Vtop binaries
 built with different Verilator flags:
   --no-coverage     Vtop                   (artifact suffix: '')
   --coverage-light  Vtop with line+user    (artifact suffix: _cov_light)
   --coverage        Vtop with full coverage (artifact suffix: _cov)
 
-The generated artifacts accept:
-  <artifact> --elf PATH [--trace-dir DIR] [--run-dir DIR] [--timeout SEC] [--keep]
-
-Coverage artifacts also write a coverage.dat into --run-dir (or into the
-location supplied via env CX_COVERAGE_OUT) by passing +covfile=<path> to
-Vtop. Supported: RV64/RV64F/RV64FD labels, one hart.
+The generated artifacts are the actual `Vtop` ELFs. Runtime support such as
+`Srec2vmem` is staged separately by scripts/stage_runtime_support.sh.
+Supported: RV64/RV64F/RV64FD labels, one hart.
 EOF
 }
 
@@ -164,7 +161,7 @@ build_verilator() {
   [[ -x "${vtop}" ]] || die "Vtop binary missing after build: ${vtop}"
 }
 
-emit_runner() {
+emit_binary() {
   local isa="$1"
   local mode="$2"
   local subdir
@@ -178,101 +175,9 @@ emit_runner() {
     rm -f "${out_file}"
   fi
 
-  cat >"${out_file}" <<'RUNNER'
-#!/usr/bin/env bash
-set -euo pipefail
-
-SELF="$(readlink -f "$0")"
-CORE_ROOT="${CX_OPENC910_ROOT:-$(cd "$(dirname "${SELF}")/../cores/openc910" 2>/dev/null && pwd || true)}"
-if [[ -z "${CORE_ROOT}" || ! -d "${CORE_ROOT}/smart_run" ]]; then
-  CORE_ROOT="__CORE_ROOT__"
-fi
-
-ELF=""
-TRACE_DIR=""
-RUN_DIR=""
-TIMEOUT_SEC="${CX_OPENCORE_TIMEOUT_SEC:-360}"
-KEEP=0
-
-usage() {
-  cat <<'EOF'
-Usage: __ARTIFACT_NAME__ --elf PATH [--trace-dir DIR] [--run-dir DIR] [--timeout SEC] [--keep]
-EOF
-}
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --elf) ELF="$2"; shift 2; continue ;;
-    --elf=*) ELF="${1#*=}" ;;
-    --trace-dir) TRACE_DIR="$2"; shift 2; continue ;;
-    --trace-dir=*) TRACE_DIR="${1#*=}" ;;
-    --run-dir) RUN_DIR="$2"; shift 2; continue ;;
-    --run-dir=*) RUN_DIR="${1#*=}" ;;
-    --timeout) TIMEOUT_SEC="$2"; shift 2; continue ;;
-    --timeout=*) TIMEOUT_SEC="${1#*=}" ;;
-    --keep) KEEP=1 ;;
-    --help|-h) usage; exit 0 ;;
-    *)
-      if [[ -z "${ELF}" && -f "$1" ]]; then
-        ELF="$1"
-      else
-        echo "ERROR: Unknown argument: $1" >&2
-        usage
-        exit 2
-      fi
-      ;;
-  esac
-  shift
-done
-
-[[ -n "${ELF}" ]] || { echo "ERROR: --elf is required" >&2; exit 2; }
-[[ -f "${ELF}" ]] || { echo "ERROR: ELF not found: ${ELF}" >&2; exit 2; }
-[[ -d "${CORE_ROOT}/smart_run" ]] || { echo "ERROR: OpenC910 smart_run not found under ${CORE_ROOT}" >&2; exit 2; }
-if [[ -z "${TOOL_EXTENSION:-}" && -n "${RISCV:-}" ]]; then
-  TOOL_EXTENSION="${RISCV}/bin"
-fi
-[[ -n "${TOOL_EXTENSION:-}" ]] || { echo "ERROR: TOOL_EXTENSION must point to riscv64-unknown-elf toolchain bin directory, or RISCV must point to the RISC-V toolchain prefix" >&2; exit 2; }
-command -v timeout >/dev/null 2>&1 || { echo "ERROR: timeout command is required" >&2; exit 2; }
-
-VTOP="${CORE_ROOT}/smart_run/__WORK_SUBDIR__/obj_dir/Vtop"
-[[ -x "${VTOP}" ]] || { echo "ERROR: Vtop binary missing at ${VTOP} (run build.sh)" >&2; exit 2; }
-
-TRACE_DIR="${TRACE_DIR:-${PWD}}"
-RUN_DIR="${RUN_DIR:-$(mktemp -d /tmp/openc910-run.XXXXXX)}"
-mkdir -p "${TRACE_DIR}" "${RUN_DIR}" "${RUN_DIR}/work"
-if (( KEEP == 0 )); then
-  trap 'rm -rf "${RUN_DIR}"' EXIT
-fi
-
-SMART="${CORE_ROOT}/smart_run"
-WORK="${RUN_DIR}/work"
-OBJCOPY="${TOOL_EXTENSION}/riscv64-unknown-elf-objcopy"
-OBJDUMP="${TOOL_EXTENSION}/riscv64-unknown-elf-objdump"
-CONVERT="${SMART}/tests/bin/Srec2vmem"
-CONVERT_EXEC="${WORK}/Srec2vmem"
-TRACE_FILE="${TRACE_DIR}/openc910_trace_hart_00000000.log"
-COV_FILE="${CX_COVERAGE_OUT:-${TRACE_DIR}/coverage.dat}"
-
-[[ -x "${OBJCOPY}" ]] || { echo "ERROR: objcopy not executable: ${OBJCOPY}" >&2; exit 2; }
-[[ -f "${CONVERT}" ]] || { echo "ERROR: Srec2vmem not found: ${CONVERT}" >&2; exit 2; }
-cp "${CONVERT}" "${CONVERT_EXEC}"
-chmod +x "${CONVERT_EXEC}"
-
-cp "${ELF}" "${WORK}/case.elf"
-"${OBJDUMP}" -S -Mnumeric "${WORK}/case.elf" > "${WORK}/case.obj" || true
-"${OBJCOPY}" -O srec "${WORK}/case.elf" "${WORK}/case_inst.hex" -j .text* -j .rodata* -j .eh_frame*
-"${OBJCOPY}" -O srec "${WORK}/case.elf" "${WORK}/case_data.hex" -j .data* -j .bss -j .COMMON
-"${CONVERT_EXEC}" "${WORK}/case_inst.hex" "${WORK}/inst.pat"
-"${CONVERT_EXEC}" "${WORK}/case_data.hex" "${WORK}/data.pat"
-
-(
-  cd "${WORK}"
-  : > "${TRACE_FILE}"
-  timeout "${TIMEOUT_SEC}" "${VTOP}" "+cx_trace=${TRACE_FILE}" "+covfile=${COV_FILE}"
-)
-RUNNER
-
-  sed -i "s#__CORE_ROOT__#${ROOT_DIR}#g; s#__ARTIFACT_NAME__#${artifact_name}#g; s#__WORK_SUBDIR__#${subdir}#g" "${out_file}"
+  local vtop="${SMART_DIR}/${subdir}/obj_dir/Vtop"
+  [[ -x "${vtop}" ]] || die "Vtop binary missing after build: ${vtop}"
+  cp -f "${vtop}" "${out_file}"
   chmod +x "${out_file}"
   echo "Exported ${out_file}"
 }
@@ -281,5 +186,5 @@ build_verilator "${COVERAGE_MODE}"
 
 for isa in "${ISAS[@]}"; do
   validate_isa "${isa}"
-  emit_runner "${isa}" "${COVERAGE_MODE}"
+  emit_binary "${isa}" "${COVERAGE_MODE}"
 done
