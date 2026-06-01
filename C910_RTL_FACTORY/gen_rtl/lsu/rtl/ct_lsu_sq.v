@@ -357,7 +357,12 @@ reg     [11 :0]  sq_data_discard_id_sel;
 reg     [11 :0]  sq_dbg_pop_ptr;                        
 reg     [39 :0]  sq_dbg_st_addr;                        
 reg     [39 :0]  sq_dbg_st_addr_ff;                     
+reg              sq_dbg_st_atomic;                      
+reg              sq_dbg_st_atomic_ff;                   
+reg              sq_dbg_st_is_sc;                       
+reg              sq_dbg_st_is_sc_ff;                    
 reg     [15 :0]  sq_dbg_st_bytes_vld;                   
+reg     [15 :0]  sq_dbg_st_bytes_vld_ff;                
 reg     [63 :0]  sq_dbg_st_data;                        
 reg     [63 :0]  sq_dbg_st_data_ff;                     
 reg     [6  :0]  sq_dbg_st_iid;                         
@@ -3788,6 +3793,35 @@ endcase
 // &CombEnd; @1143
 end
 
+// &CombBeg;
+always @( sq_entry_atomic[3:0]
+       or sq_entry_atomic[7:4]
+       or sq_entry_atomic[11:8]
+       or sq_dbg_pop_ptr[11:0])
+begin
+case(sq_dbg_pop_ptr[SQ_ENTRY-1:0])
+  12'b0000_0000_0001:sq_dbg_st_atomic = sq_entry_atomic[0];
+  12'b0000_0000_0010:sq_dbg_st_atomic = sq_entry_atomic[1];
+  12'b0000_0000_0100:sq_dbg_st_atomic = sq_entry_atomic[2];
+  12'b0000_0000_1000:sq_dbg_st_atomic = sq_entry_atomic[3];
+  12'b0000_0001_0000:sq_dbg_st_atomic = sq_entry_atomic[4];
+  12'b0000_0010_0000:sq_dbg_st_atomic = sq_entry_atomic[5];
+  12'b0000_0100_0000:sq_dbg_st_atomic = sq_entry_atomic[6];
+  12'b0000_1000_0000:sq_dbg_st_atomic = sq_entry_atomic[7];
+  12'b0001_0000_0000:sq_dbg_st_atomic = sq_entry_atomic[8];
+  12'b0010_0000_0000:sq_dbg_st_atomic = sq_entry_atomic[9];
+  12'b0100_0000_0000:sq_dbg_st_atomic = sq_entry_atomic[10];
+  12'b1000_0000_0000:sq_dbg_st_atomic = sq_entry_atomic[11];
+  default:sq_dbg_st_atomic = 1'bx;
+endcase
+// &CombEnd;
+end
+
+always @*
+begin
+  sq_dbg_st_is_sc = sq_pop_atomic && (sq_pop_inst_type[1:0] == 2'b01);
+end
+
 // &CombBeg; @1145
 always @( sq_entry_addr0_3[39:0]
        or sq_entry_addr0_7[39:0]
@@ -3916,12 +3950,18 @@ begin
   if (!cpurst_b)
   begin
     sq_dbg_st_addr_ff[`PA_WIDTH-1:0] <=  {`PA_WIDTH{1'b0}};
+    sq_dbg_st_atomic_ff <=  1'b0;
+    sq_dbg_st_is_sc_ff <=  1'b0;
+    sq_dbg_st_bytes_vld_ff[15:0] <=  16'b0;
     sq_dbg_st_data_ff[63:0] <=  64'b0;
     sq_dbg_st_iid_ff[6:0]   <=  7'b0;
   end
   else if(sq_dbg_st_req)
   begin
     sq_dbg_st_addr_ff[`PA_WIDTH-1:0] <=  sq_dbg_st_addr[`PA_WIDTH-1:0];
+    sq_dbg_st_atomic_ff <=  sq_dbg_st_atomic;
+    sq_dbg_st_is_sc_ff <=  sq_dbg_st_is_sc;
+    sq_dbg_st_bytes_vld_ff[15:0] <=  sq_dbg_st_bytes_vld[15:0];
     sq_dbg_st_data_ff[63:0] <=  sq_dbg_st_data_compress64[63:0];
     sq_dbg_st_iid_ff[6:0]   <=  sq_dbg_st_iid[6:0];
   end
@@ -3963,5 +4003,3 @@ assign lsu_had_st_type[3:0]   = had_lsu_bus_trace_en
 
 // &ModuleEnd; @1308
 endmodule
-
-
