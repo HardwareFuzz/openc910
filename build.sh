@@ -3,7 +3,7 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./build.sh [--isa rv64|rv64f|rv64fd]... [--cores 1]
+Usage: ./build.sh [--isa rv64f|rv64fd]... [--cores 1|2]
                   [--coverage|--coverage-light|--no-coverage]
                   [--out-dir DIR] [--clean]
 
@@ -17,7 +17,7 @@ built with different Verilator flags:
 
 The generated artifacts are the actual `Vtop` ELFs. Runtime support such as
 `Srec2vmem` is staged separately by scripts/stage_runtime_support.sh.
-Supported: RV64/RV64F/RV64FD labels, 1 or 2 hart.
+Supported: RV64F/RV64FD labels, 1 or 2 hart.
 EOF
 }
 
@@ -59,7 +59,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#ISAS[@]} -eq 0 ]]; then
-  ISAS=(rv64)
+  ISAS=(rv64fd)
 fi
 
 if [[ "${CORES}" != "1" && "${CORES}" != "2" ]]; then
@@ -100,8 +100,8 @@ extra_vlt_args_for_mode() {
 
 validate_isa() {
   case "$1" in
-    rv64|rv64f|rv64fd) ;;
-    *) echo "ERROR: OpenC910 integration supports --isa rv64, rv64f, rv64fd only (got: $1)" >&2; exit 2 ;;
+    rv64f|rv64fd) ;;
+    *) echo "ERROR: OpenC910 integration supports --isa rv64f, rv64fd only (got: $1)" >&2; exit 2 ;;
   esac
 }
 
@@ -181,6 +181,10 @@ emit_binary() {
   chmod +x "${out_file}"
   echo "Exported ${out_file}"
 }
+
+for isa in "${ISAS[@]}"; do
+  validate_isa "${isa}"
+done
 
 build_verilator "${COVERAGE_MODE}"
 
