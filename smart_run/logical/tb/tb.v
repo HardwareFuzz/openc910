@@ -272,6 +272,8 @@ module tb();
     cx_trace_file = $fopen(cx_trace_path, "w");
   end
 
+  `include "cx_trace_v2.vh"
+
   always @(posedge clk)
   begin
     if(cx_trace_file != 0) begin
