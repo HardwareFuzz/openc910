@@ -2344,17 +2344,16 @@ always @( ex2_src_change
        or ex2_src0_e_fm[10:0]
        or ex2_src1_is_snan)
 begin
-if(ex2_src0_is_snan || ex2_src1_is_snan || 
-   ex2_src0_is_qnan && ex2_src1_is_qnan)
+if(ex2_src0_is_qnan && ex2_src1_is_qnan)
 ex2_max_nm_result[63:0] =  {64{ex2_double}} & {ex2_qnan_s, {11{1'b1}}, ex2_qnan_f[51:0]} |
                            {64{ex2_single}} & {32'hffffffff, ex2_qnan_s, { 8{1'b1}}, ex2_qnan_f[22:0]};
 else if(ex2_src0_is_0 && ex2_src1_is_0)
 ex2_max_nm_result[63:0] = {64{ex2_double}} & {              {ex2_src0_s & ex2_src1_s}, {11'b0}, 52'b0} |
                           {64{ex2_single}} & {32'hffffffff, {ex2_src0_s & ex2_src1_s}, { 8'b0}, 23'b0};
-else if(ex2_src0_is_qnan)
+else if(ex2_src0_is_qnan || ex2_src0_is_snan)
 ex2_max_nm_result[63:0] = {64{ex2_double}} & {              ex2_src1_s, ex2_src1_e_fm[10:0], ex2_src1_f[51:0]}|
                           {64{ex2_single}} & {32'hffffffff, ex2_src1_s, ex2_src1_e_fm[ 7:0], ex2_src1_f[22:0]};
-else if(ex2_src1_is_qnan)
+else if(ex2_src1_is_qnan || ex2_src1_is_snan)
 ex2_max_nm_result[63:0] = {64{ex2_double}} & {              ex2_src0_s, ex2_src0_e_fm[10:0], ex2_src0_f[51:0]}|
                           {64{ex2_single}} & {32'hffffffff, ex2_src0_s, ex2_src0_e_fm[ 7:0], ex2_src0_f[22:0]};
 else if(ex2_sign ^ ex2_src_change)
@@ -2387,17 +2386,16 @@ always @( ex2_src_change
        or ex2_src0_e_fm[10:0]
        or ex2_src1_is_snan)
 begin
-if(ex2_src0_is_snan || ex2_src1_is_snan || 
-   ex2_src0_is_qnan && ex2_src1_is_qnan)
+if(ex2_src0_is_qnan && ex2_src1_is_qnan)
 ex2_min_nm_result[63:0] = {64{ex2_double}} & {              ex2_qnan_s, {11{1'b1}}, ex2_qnan_f[51:0]} |
                           {64{ex2_single}} & {32'hffffffff, ex2_qnan_s, { 8{1'b1}}, ex2_qnan_f[22:0]};
 else if(ex2_src0_is_0 && ex2_src1_is_0)
 ex2_min_nm_result[63:0] = {64{ex2_double}} & {              {ex2_src0_s | ex2_src1_s}, {11'b0}, 52'b0}|
                           {64{ex2_single}} & {32'hffffffff, {ex2_src0_s | ex2_src1_s}, { 8'b0}, 23'b0};
-else if(ex2_src0_is_qnan)
+else if(ex2_src0_is_qnan || ex2_src0_is_snan)
 ex2_min_nm_result[63:0] = {64{ex2_double}} & {              ex2_src1_s, ex2_src1_e_fm[10:0], ex2_src1_f[51:0]}|
                           {64{ex2_single}} & {32'hffffffff, ex2_src1_s, ex2_src1_e_fm[ 7:0], ex2_src1_f[22:0]};
-else if(ex2_src1_is_qnan)
+else if(ex2_src1_is_qnan || ex2_src1_is_snan)
 ex2_min_nm_result[63:0] = {64{ex2_double}} & {              ex2_src0_s, ex2_src0_e_fm[10:0], ex2_src0_f[51:0]}|
                           {64{ex2_single}} & {32'hffffffff, ex2_src0_s, ex2_src0_e_fm[ 7:0], ex2_src0_f[22:0]};
 else if(!ex2_sign ^ ex2_src_change)

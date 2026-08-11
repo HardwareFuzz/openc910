@@ -2046,14 +2046,13 @@ always @( ex2_qnan_s
        or ex2_src1_f[9:0]
        or ex2_src1_is_qnan)
 begin
-if(ex2_src0_is_snan || ex2_src1_is_snan || 
-   ex2_src0_is_qnan && ex2_src1_is_qnan)
+if(ex2_src0_is_qnan && ex2_src1_is_qnan)
 ex2_max_nm_result[15:0] = { ex2_qnan_s, { 5{1'b1}}, ex2_qnan_f[9:0]};
 else if(ex2_src0_is_0 && ex2_src1_is_0)
 ex2_max_nm_result[15:0] = { {ex2_src0_s & ex2_src1_s}, { 5'b0}, 10'b0};
-else if(ex2_src0_is_qnan)
+else if(ex2_src0_is_qnan || ex2_src0_is_snan)
 ex2_max_nm_result[15:0] = { ex2_src1_s, ex2_src1_e_fm[4:0], ex2_src1_f[9:0]};
-else if(ex2_src1_is_qnan)
+else if(ex2_src1_is_qnan || ex2_src1_is_snan)
 ex2_max_nm_result[15:0] = { ex2_src0_s, ex2_src0_e_fm[4:0], ex2_src0_f[9:0]};                        
 else if(ex2_sign ^ ex2_src_change)
 ex2_max_nm_result[15:0] = { ex2_src1_s, ex2_src1_e_fm[ 4:0], ex2_src1_f[9:0]};
@@ -2081,14 +2080,13 @@ always @( ex2_qnan_s
        or ex2_src1_f[9:0]
        or ex2_src1_is_qnan)
 begin
-if(ex2_src0_is_snan || ex2_src1_is_snan || 
-   ex2_src0_is_qnan && ex2_src1_is_qnan)
+if(ex2_src0_is_qnan && ex2_src1_is_qnan)
 ex2_min_nm_result[15:0] = { ex2_qnan_s, { 5{1'b1}}, ex2_qnan_f[9:0]};
 else if(ex2_src0_is_0 && ex2_src1_is_0)
 ex2_min_nm_result[15:0] = { {ex2_src0_s | ex2_src1_s}, { 5'b0}, 10'b0};
-else if(ex2_src0_is_qnan)
+else if(ex2_src0_is_qnan || ex2_src0_is_snan)
 ex2_min_nm_result[15:0] = { ex2_src1_s, ex2_src1_e_fm[4:0], ex2_src1_f[9:0]};
-else if(ex2_src1_is_qnan)
+else if(ex2_src1_is_qnan || ex2_src1_is_snan)
 ex2_min_nm_result[15:0] = { ex2_src0_s, ex2_src0_e_fm[4:0], ex2_src0_f[9:0]};                        
 else if(!ex2_sign ^ ex2_src_change)
 ex2_min_nm_result[15:0] = { ex2_src1_s, ex2_src1_e_fm[4:0], ex2_src1_f[9:0]};

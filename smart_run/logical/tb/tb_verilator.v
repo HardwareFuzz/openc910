@@ -413,13 +413,20 @@ module top(
                 `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.vfpu_idu_ex5_pipe7_wb_vreg_fr_data[63:0]);
       end
       if(`tb_retire0) begin
-        $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d",
-                cycle_count[31:0], `retire0_pc,
-                `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit0_iid[6:0]);
+        // Single $fwrite per line: cx_trace_v2.vh inst_terminal runs in its own
+        // always block and interleaves $fwrite calls to the same FILE*, so a
+        // multi-call commit line (fmt + exc_cause + "\n") lets the other block's
+        // line splice inside (4CXTRACE / 62CXTRACE newline gluing).
         if(`CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_cp0_expt_vld) begin
-          $fwrite(cx_trace_file, " exc_cause=%0d", `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_expt_vec[4:0]);
+          $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d exc_cause=%0d\n",
+                  cycle_count[31:0], `retire0_pc,
+                  `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit0_iid[6:0],
+                  `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_expt_vec[4:0]);
+        end else begin
+          $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d\n",
+                  cycle_count[31:0], `retire0_pc,
+                  `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit0_iid[6:0]);
         end
-        $fwrite(cx_trace_file, "\n");
       end
       if(`tb_retire1) begin
         $fwrite(cx_trace_file, "commit cycle=%0d hart=0 pc=0x%010x iid=%0d\n",
@@ -530,13 +537,16 @@ module top(
                 `CPU_TOP.x_ct_top_1.x_ct_core.x_ct_vfpu_top.x_ct_vfpu_rbus.vfpu_idu_ex5_pipe7_wb_vreg_fr_data[63:0]);
       end
       if(`tb_core1_retire0) begin
-        $fwrite(cx_trace_file, "commit cycle=%0d hart=1 pc=0x%010x iid=%0d",
-                cycle_count[31:0], `core1_retire0_pc,
-                `CPU_TOP.x_ct_top_1.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit0_iid[6:0]);
         if(`CPU_TOP.x_ct_top_1.x_ct_core.x_ct_rtu_top.rtu_cp0_expt_vld) begin
-          $fwrite(cx_trace_file, " exc_cause=%0d", `CPU_TOP.x_ct_top_1.x_ct_core.x_ct_rtu_top.rtu_yy_xx_expt_vec[4:0]);
+          $fwrite(cx_trace_file, "commit cycle=%0d hart=1 pc=0x%010x iid=%0d exc_cause=%0d\n",
+                  cycle_count[31:0], `core1_retire0_pc,
+                  `CPU_TOP.x_ct_top_1.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit0_iid[6:0],
+                  `CPU_TOP.x_ct_top_1.x_ct_core.x_ct_rtu_top.rtu_yy_xx_expt_vec[4:0]);
+        end else begin
+          $fwrite(cx_trace_file, "commit cycle=%0d hart=1 pc=0x%010x iid=%0d\n",
+                  cycle_count[31:0], `core1_retire0_pc,
+                  `CPU_TOP.x_ct_top_1.x_ct_core.x_ct_rtu_top.rtu_yy_xx_commit0_iid[6:0]);
         end
-        $fwrite(cx_trace_file, "\n");
       end
       if(`tb_core1_retire1) begin
         $fwrite(cx_trace_file, "commit cycle=%0d hart=1 pc=0x%010x iid=%0d\n",
