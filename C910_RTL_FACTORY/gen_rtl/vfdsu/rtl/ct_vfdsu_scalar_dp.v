@@ -191,8 +191,40 @@ assign ex1_static_rm[2:0] = dp_vfdsu_ex1_pipex_imm0[2:0];
 // &Force("output","ex1_double"); @63
 // &Force("output","ex1_single"); @64
 
-assign ex1_src0[63:0]    = dp_vfdsu_ex1_pipex_srcf0[63:0];
-assign ex1_src1[63:0]    = dp_vfdsu_ex1_pipex_srcf1[63:0];
+// f32/f16 NaN-box read check (RISC-V spec "NaN Boxing of Narrower Values"):
+// non-transfer narrow-precision source reads on improperly NaN-boxed
+// registers are treated as canonical NaN (f32: 0x7fc00000, f16: 0x7e00).
+// Properly boxed sources and f64 sources pass through unchanged.
+// Uses the combinational func bits (ex1_single/ex1_double are flops one
+// stage later and cannot gate the same-cycle source). Upstream T-Head RTL
+// defect: this check was absent.
+wire vfdsu_src0_f32_boxed_ok =
+    (dp_vfdsu_ex1_pipex_srcf0[63:32] == 32'hffffffff);
+wire vfdsu_src1_f32_boxed_ok =
+    (dp_vfdsu_ex1_pipex_srcf1[63:32] == 32'hffffffff);
+wire vfdsu_src0_f16_boxed_ok =
+    (dp_vfdsu_ex1_pipex_srcf0[63:16] == 48'hffffffffffff);
+wire vfdsu_src1_f16_boxed_ok =
+    (dp_vfdsu_ex1_pipex_srcf1[63:16] == 48'hffffffffffff);
+wire vfdsu_ex1_single_c = idu_vfpu_rf_pipex_func[15];
+wire vfdsu_ex1_double_c = idu_vfpu_rf_pipex_func[16];
+wire vfdsu_ex1_half_c   = !vfdsu_ex1_single_c && !vfdsu_ex1_double_c;
+wire [63:0] vfdsu_src0_nanboxed;
+wire [63:0] vfdsu_src1_nanboxed;
+assign vfdsu_src0_nanboxed[63:0] =
+      vfdsu_ex1_single_c ? (vfdsu_src0_f32_boxed_ok ? dp_vfdsu_ex1_pipex_srcf0[63:0]
+                                                    : {32'hffffffff, 32'h7fc00000})
+    : vfdsu_ex1_half_c   ? (vfdsu_src0_f16_boxed_ok ? dp_vfdsu_ex1_pipex_srcf0[63:0]
+                                                    : {48'hffffffffffff, 16'h7e00})
+    : dp_vfdsu_ex1_pipex_srcf0[63:0];
+assign vfdsu_src1_nanboxed[63:0] =
+      vfdsu_ex1_single_c ? (vfdsu_src1_f32_boxed_ok ? dp_vfdsu_ex1_pipex_srcf1[63:0]
+                                                    : {32'hffffffff, 32'h7fc00000})
+    : vfdsu_ex1_half_c   ? (vfdsu_src1_f16_boxed_ok ? dp_vfdsu_ex1_pipex_srcf1[63:0]
+                                                    : {48'hffffffffffff, 16'h7e00})
+    : dp_vfdsu_ex1_pipex_srcf1[63:0];
+assign ex1_src0[63:0]    = vfdsu_src0_nanboxed[63:0];
+assign ex1_src1[63:0]    = vfdsu_src1_nanboxed[63:0];
 
 
 always @(posedge ex1_data_clk or negedge cpurst_b)

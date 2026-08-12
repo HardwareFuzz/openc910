@@ -219,8 +219,39 @@ assign ex1_rm_rtz = (vfalu_rm[2:0] == 3'b001);
 assign ex1_rm_rdn = (vfalu_rm[2:0] == 3'b010);
 assign ex1_rm_rup = (vfalu_rm[2:0] == 3'b011);
 assign ex1_rm_rmm = (vfalu_rm[2:0] == 3'b100);
-assign fadd_ctrl_src0[63:0]  = dp_vfalu_ex1_pipex_srcf0[63:0];
-assign fadd_ctrl_src1[63:0]  = dp_vfalu_ex1_pipex_srcf1[63:0];
+// f32/f16 NaN-box read check (RISC-V spec "NaN Boxing of Narrower Values"):
+// non-transfer narrow-precision ops reading an improperly NaN-boxed source
+// must treat that source as an n-bit canonical NaN (f32: 0x7fc00000,
+// f16: 0x7e00). Properly boxed sources (f32: upper 32 bits all 1s; f16:
+// upper 48 bits all 1s) and f64 sources pass through unchanged.
+// Upstream T-Head RTL defect: this check was absent (single-width sources
+// were taken from the raw 64-bit register value's low bits).
+wire fadd_src0_f32_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf0[63:32] == 32'hffffffff);
+wire fadd_src1_f32_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf1[63:32] == 32'hffffffff);
+wire fadd_src0_f16_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf0[63:16] == 48'hffffffffffff);
+wire fadd_src1_f16_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf1[63:16] == 48'hffffffffffff);
+wire fadd_src_ex1_half =
+    !ex1_double && !ex1_single;
+wire [63:0] fadd_src0_nanboxed;
+wire [63:0] fadd_src1_nanboxed;
+assign fadd_src0_nanboxed[63:0] =
+      ex1_single ? (fadd_src0_f32_boxed_ok ? dp_vfalu_ex1_pipex_srcf0[63:0]
+                                           : {32'hffffffff, 32'h7fc00000})
+    : fadd_src_ex1_half ? (fadd_src0_f16_boxed_ok ? dp_vfalu_ex1_pipex_srcf0[63:0]
+                                                  : {48'hffffffffffff, 16'h7e00})
+    : dp_vfalu_ex1_pipex_srcf0[63:0];
+assign fadd_src1_nanboxed[63:0] =
+      ex1_single ? (fadd_src1_f32_boxed_ok ? dp_vfalu_ex1_pipex_srcf1[63:0]
+                                           : {32'hffffffff, 32'h7fc00000})
+    : fadd_src_ex1_half ? (fadd_src1_f16_boxed_ok ? dp_vfalu_ex1_pipex_srcf1[63:0]
+                                                  : {48'hffffffffffff, 16'h7e00})
+    : dp_vfalu_ex1_pipex_srcf1[63:0];
+assign fadd_ctrl_src0[63:0]  = fadd_src0_nanboxed[63:0];
+assign fadd_ctrl_src1[63:0]  = fadd_src1_nanboxed[63:0];
 
 
 // &Force("bus","dp_vfalu_ex1_pipex_func",19,0); @42
