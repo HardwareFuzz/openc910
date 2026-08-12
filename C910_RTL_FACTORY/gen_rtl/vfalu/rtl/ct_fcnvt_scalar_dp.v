@@ -236,7 +236,23 @@ assign ex1_dest_double    = ex1_dest_float && ex1_dest_l64;
 // //&Force("output","ex1_dest_si"); @94
 // &Force("output","ex1_sover"); @95
 
-assign ex1_src0[63:0]                = dp_vfalu_ex1_pipex_srcf0[63:0];
+// f32/f16 NaN-box read check (RISC-V spec "NaN Boxing of Narrower Values"):
+// non-transfer narrow-precision source reads on improperly NaN-boxed
+// registers are treated as canonical NaN (f32: 0x7fc00000, f16: 0x7e00).
+// Properly boxed sources and f64 sources pass through unchanged.
+// Upstream T-Head RTL defect: this check was absent.
+wire fcnvt_src0_f32_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf0[63:32] == 32'hffffffff);
+wire fcnvt_src0_f16_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf0[63:16] == 48'hffffffffffff);
+wire [63:0] fcnvt_src0_nanboxed;
+assign fcnvt_src0_nanboxed[63:0] =
+      ex1_src_l16    ? (fcnvt_src0_f16_boxed_ok ? dp_vfalu_ex1_pipex_srcf0[63:0]
+                                                : {48'hffffffffffff, 16'h7e00})
+    : ex1_src_single ? (fcnvt_src0_f32_boxed_ok ? dp_vfalu_ex1_pipex_srcf0[63:0]
+                                                : {32'hffffffff, 32'h7fc00000})
+    : dp_vfalu_ex1_pipex_srcf0[63:0];
+assign ex1_src0[63:0]                = fcnvt_src0_nanboxed[63:0];
 assign dp_ex1_src[63:0]              = ex1_src0[63:0];
 
 

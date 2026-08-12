@@ -161,8 +161,39 @@ assign ex1_op_doub_fmvfx   = ex1_op_fmvfx && ex1_double;
 // &Force("bus","dp_vfalu_ex1_pipex_srcv0",63,0); @104
 // &Force("bus","dp_vfalu_ex1_pipex_srcv1",63,0); @105
 // &Force("bus","dp_vfalu_ex1_pipex_mtvr_src0",63,0); @106
-assign ex1_pipex_src0[63:0]  = dp_vfalu_ex1_pipex_srcf0[63:0];
-assign ex1_pipex_src1[63:0]  = dp_vfalu_ex1_pipex_srcf1[63:0];
+// f32/f16 NaN-box read check (RISC-V spec "NaN Boxing of Narrower Values"):
+// fsgnj/fclass are non-transfer narrow-precision ops: an improperly
+// NaN-boxed source is treated as canonical NaN (f32: 0x7fc00000,
+// f16: 0x7e00). fmv.* are transfer instructions and pass sources through
+// unchanged; f64 sources pass through unchanged. Upstream T-Head RTL
+// defect: this check was absent.
+wire fspu_ex1_nanbox_en = (func[6] || func[18]) && !func[5];
+wire fspu_src0_f32_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf0[63:32] == 32'hffffffff);
+wire fspu_src1_f32_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf1[63:32] == 32'hffffffff);
+wire fspu_src0_f16_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf0[63:16] == 48'hffffffffffff);
+wire fspu_src1_f16_boxed_ok =
+    (dp_vfalu_ex1_pipex_srcf1[63:16] == 48'hffffffffffff);
+wire fspu_ex1_half =
+    !ex1_single && !ex1_double;
+wire [63:0] fspu_src0_nanboxed;
+wire [63:0] fspu_src1_nanboxed;
+assign fspu_src0_nanboxed[63:0] =
+      fspu_ex1_nanbox_en && ex1_single ? (fspu_src0_f32_boxed_ok ? dp_vfalu_ex1_pipex_srcf0[63:0]
+                                                                 : {32'hffffffff, 32'h7fc00000})
+    : fspu_ex1_nanbox_en && fspu_ex1_half ? (fspu_src0_f16_boxed_ok ? dp_vfalu_ex1_pipex_srcf0[63:0]
+                                                                     : {48'hffffffffffff, 16'h7e00})
+    : dp_vfalu_ex1_pipex_srcf0[63:0];
+assign fspu_src1_nanboxed[63:0] =
+      fspu_ex1_nanbox_en && ex1_single ? (fspu_src1_f32_boxed_ok ? dp_vfalu_ex1_pipex_srcf1[63:0]
+                                                                 : {32'hffffffff, 32'h7fc00000})
+    : fspu_ex1_nanbox_en && fspu_ex1_half ? (fspu_src1_f16_boxed_ok ? dp_vfalu_ex1_pipex_srcf1[63:0]
+                                                                     : {48'hffffffffffff, 16'h7e00})
+    : dp_vfalu_ex1_pipex_srcf1[63:0];
+assign ex1_pipex_src0[63:0]  = fspu_src0_nanboxed[63:0];
+assign ex1_pipex_src1[63:0]  = fspu_src1_nanboxed[63:0];
 
 
 // &Force("nonport","set0_sing1_result_fmfvr"); @125
